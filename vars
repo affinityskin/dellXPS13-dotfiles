@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# i3 profile Setup Script
+#
+# Distribution: Ubuntu Server 15.10
+#
+# Author:	loki
+
+# Build Directories
+BUILDDIR=${HOME}/.zbcnc
+MAKEDIR=/tmp
+ROOTDIR=/root
+
+# Dotfile Directories
+DOTFILES=$BUILDDIR/dots
+ROOTDOTS=$BUILDDIR/rootdot
+
+# Export Environment Variables
+export BUILDDIR
+export MAKEDIR
+export ROOTDIR
+export DOTFILES
+export ROOTDOTS

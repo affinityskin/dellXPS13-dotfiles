@@ -54,8 +54,8 @@ main() {
 		zbcnc_xDeps & showLoading "$@"
 		zbcnc_xorg & showLoading "$@"
 		zbcnc_i3Deps & showLoading "$@"
-		zbcnc_i3wm "$@" & showLoading
-		zbcnc_wmapps "$@" & showLoading
+		zbcnc_i3wm "$@" & showLoading "$@"
+		zbcnc_wmapps "$@" & showLoading "$@"
 
 	elif [[ $cmd == "dotfiles" ]]; then
 		zbcnc_username
@@ -90,8 +90,8 @@ set_username() {
 	export USERNAME
 }
 
-zbcnc_setVars() {
-	cp "$HOME"/.build-scripts/99-vars.sh "$HOME"/.vars.sh
+zbcnc_vars() {
+	cp "$HOME"/projects.io/zbcnc/dots/ "$HOME"/.vars.sh
 	source "$HOME"/.vars.sh
 
 	sleep 2
@@ -842,7 +842,13 @@ zbcnc_golang() {
 	go get github.com/shurcooL/markdownfmt
 	go get github.com/Soulou/curl-unix-socket
 
-	aliases=( cloudflare/cfssl docker/docker kubernetes/kubernetes letsencrypt/boulder opencontainers/runc jfrazelle/binctr jfrazelle/contained.af )
+	aliases=( cloudflare/cfssl \
+				docker/docker \
+				kubernetes/kubernetes \
+				letsencrypt/boulder \
+				opencontainers/runc \
+				jfrazelle/binctr \
+				jfrazelle/contained.af )
 	for project in "${aliases[@]}"; do
 		owner=$(dirname "$project")
 		repo=$(basename "$project")
@@ -1071,4 +1077,28 @@ zbcnc_sublime() {
 }
 zbcnc_atom() {
 	cd "${MAKEDIR}"
+	curl -L https://atom.io/download/deb -o atom.deb
+	dpkg -i atom.deb
+}
+
+zbcnc_minify() {
+	# Sublime Minify Dependencies
+	npm install -g \
+		clean-css \
+		uglifycss \
+		js-beautify \
+		html-minifier \
+		uglify-js \
+		minjson \
+		svgo
+}
+
+zbcnc_yeoman(){
+	npm install -g \
+		gulp-cli \
+		bower \
+		yo \
+		browserify \
+		assemble \
+		browser-sync
 }
