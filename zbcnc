@@ -126,28 +126,28 @@ zbcnc_sources() {
 	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main 
 	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4096R/4221BA96
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
 
 	# add ansible
 	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
 	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main  
 	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4096R/7BB9C367
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
 
 	# add neovim
 	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
 	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main 
 	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4096R/8231B6DD
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
 
 	# add git-core
 	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
 	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main 
 	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1024R/E1DF1F24
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
 
 	# add virtualbox
 	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
