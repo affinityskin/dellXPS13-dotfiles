@@ -12,77 +12,6 @@
 #
 ########################################################################
 
-usage() {
-	echo -e "zeroBytes Comand & Controler\n\tAn installation helper for a debian laptop setup\n"
-	echo "Usage:"
-	echo "  sources                     - setup sources & install base pkgs"
-	echo "  i3wm                        - install i3 window manager"
-	echo "  dotfiles                    - link dotfiles"
-	echo "  docker                      - install docker"
-	echo "  python {icdiff,ansible}     - install icdiff or Ansible"
-	echo "  golang                      - install golang and packages"
-	echo "  scripts                     - install scripts"
-	echo "  syncthing                   - install syncthing"
-	echo "  vagrant                     - install vagrant and virtualbox"
-}
-
-main() {
-	local cmd=$1
-
-	if [[ -z "$cmd" ]]; then
-		usage
-		exit 1
-	fi
-
-	if [[ $cmd == "sources" ]]; then
-		check_is_sudo
-		set_username
-		zbcnc_sources
-		zbcnc_appUtils
-		zbcnc_graphics
-
-	elif [[ $cmd == "graphics" ]]; then
-		check_is_sudo
-		zbcnc_graphics "$2"
-
-	elif [[ $cmd == "python" ]]; then
-		check_is_sudo
-		zbcnc_python "$2"
-
-	elif [[ $cmd == "i3wm" ]]; then
-		check_is_sudo
-		zbcnc_xDeps & showLoading "$@"
-		zbcnc_xorg & showLoading "$@"
-		zbcnc_i3Deps & showLoading "$@"
-		zbcnc_i3wm "$@" & showLoading "$@"
-		zbcnc_wmapps "$@" & showLoading "$@"
-
-	elif [[ $cmd == "dotfiles" ]]; then
-		zbcnc_username
-		zbcnc_dotfiles
-		zbcnc_rootdots
-		#get_dotfiles
-	elif [[ $cmd == "docker" ]]; then
-		zbcnc_docker "$2"
-	elif [[ $cmd == "fSudo" ]]; then
-		zbcnc_fSudo
-	elif [[ $cmd == "golang" ]]; then
-		zbcnc_golang "$2"
-	elif [[ $cmd == "scripts" ]]; then
-		zbcnc_scripts
-	elif [[ $cmd == "syncthing" ]]; then
-		zbcnc_syncthing
-	elif [[ $cmd == "vagrant" ]]; then
-		zbcnc_vagrant "$2"
-
-	else
-		usage
-	fi
-}
-
-main "$@"
-
-
 set_username() {
 	echo "Please enter your user name"
 	read -p 'Username: ' USERNAME
@@ -91,8 +20,8 @@ set_username() {
 }
 
 zbcnc_vars() {
-	cp "$HOME"/projects.io/zbcnc/dots/ "$HOME"/.vars.sh
-	source "$HOME"/.vars.sh
+	cp "$HOME"/zbcnc/dots/vars "$HOME"/.vars
+	source "$HOME"/.vars
 }
 
 showLoading() {
@@ -1139,3 +1068,76 @@ zbcnc_yeoman(){
 		assemble \
 		browser-sync
 }
+
+usage() {
+	echo -e "zeroBytes Comand & Controler\n\tAn installation helper for a debian laptop setup\n"
+	echo "Usage:"
+	echo "  sources                     - setup sources & install base pkgs"
+	echo "  i3wm                        - install i3 window manager"
+	echo "  dotfiles                    - link dotfiles"
+	echo "  docker                      - install docker"
+	echo "  python {icdiff,ansible}     - install icdiff or Ansible"
+	echo "  golang                      - install golang and packages"
+	echo "  scripts                     - install scripts"
+	echo "  syncthing                   - install syncthing"
+	echo "  vagrant                     - install vagrant and virtualbox"
+}
+
+main() {
+	local cmd=$1
+
+	if [[ -z "$cmd" ]]; then
+		usage
+		exit 1
+	fi
+
+	if [[ $cmd == "sources" ]]; then
+		checkSudo
+		set_username
+		zbcnc_vars
+		zbcnc_sources
+		zbcnc_appUtils
+		zbcnc_graphics
+
+	elif [[ $cmd == "graphics" ]]; then
+		check_is_sudo
+		zbcnc_graphics "$2"
+
+	elif [[ $cmd == "python" ]]; then
+		check_is_sudo
+		zbcnc_python "$2"
+
+	elif [[ $cmd == "i3wm" ]]; then
+		check_is_sudo
+		zbcnc_xDeps & showLoading "$@"
+		zbcnc_xorg & showLoading "$@"
+		zbcnc_i3Deps & showLoading "$@"
+		zbcnc_i3wm "$@" & showLoading "$@"
+		zbcnc_wmapps "$@" & showLoading "$@"
+
+	elif [[ $cmd == "dotfiles" ]]; then
+		zbcnc_username
+		zbcnc_dotfiles
+		zbcnc_rootdots
+		#get_dotfiles
+	elif [[ $cmd == "docker" ]]; then
+		zbcnc_docker "$2"
+	elif [[ $cmd == "fSudo" ]]; then
+		zbcnc_fSudo
+	elif [[ $cmd == "golang" ]]; then
+		zbcnc_golang "$2"
+	elif [[ $cmd == "scripts" ]]; then
+		zbcnc_scripts
+	elif [[ $cmd == "syncthing" ]]; then
+		zbcnc_syncthing
+	elif [[ $cmd == "vagrant" ]]; then
+		zbcnc_vagrant "$2"
+
+	else
+		usage
+	fi
+}
+
+main "$@"
+
+
