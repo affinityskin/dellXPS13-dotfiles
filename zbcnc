@@ -93,24 +93,6 @@ set_username() {
 zbcnc_vars() {
 	cp "$HOME"/projects.io/zbcnc/dots/ "$HOME"/.vars.sh
 	source "$HOME"/.vars.sh
-
-	sleep 2
-
-	# Build Directories
-	BUILDDIR="$HOME"/.build-scripts
-	MAKEDIR=/tmp
-	ROOTDIR=/root
-
-	# Dotfile Directories
-	DOTFILES=${BUILD}/dotfiles
-	ROOTDOTS=${BUILD}/rootdot
-
-	# Export Environment Variables
-	export BUILDDIR
-	export MAKEDIR
-	export ROOTDIR
-	export DOTFILES
-	export ROOTDOTS
 }
 
 showLoading() {

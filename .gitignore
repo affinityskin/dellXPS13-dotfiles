@@ -1,0 +1,26 @@
+*/*.swp
+*/.vim/.netrwhist
+dotfiles/.i3/config.vanilla
+*/__pycache__
+*.pyc
+
+dotfiles/.config/*
+!.config/dunst
+!.config/gsimplecal
+!.config/gtk-2.0
+!.config/gtk-3.0
+!.config/termite
+!.config/wallpapers
+!.config/sublime-text-3/Installed Packages/
+!.config/htop
+!.config/htop/htoprc
+!.config/i3lock
+!.config/i3blocks
+!.config/i3blocks/config
+!.config/filezilla
+
+
+dotfiles/.weechat/*
+!.weechat/weechat.conf
+!.weechat/plugins.conf
+!.weechat/perl/beep.pl
