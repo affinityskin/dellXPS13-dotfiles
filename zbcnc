@@ -12,40 +12,18 @@
 #
 ########################################################################
 
-set_username() {
+setUsername() {
 	echo "Please enter your user name"
 	read -p 'Username: ' USERNAME
 	USERNAME="${USERNAME}"
 	export USERNAME
+	echo "$USERNAME"
 }
 
-zbcnc_vars() {
+setVars() {
 	cp "$HOME"/zbcnc/dots/vars "$HOME"/.vars
 	source "$HOME"/.vars
 }
-
-showLoading() {
-  mypid=$!
-  loadingText=$1
-
-  echo -ne "$loadingText\r"
-
-  while kill -0 $mypid 2>/dev/null; do
-    echo -ne "$loadingText.\r"
-    sleep 0.5
-    echo -ne "$loadingText..\r"
-    sleep 0.5
-    echo -ne "$loadingText...\r"
-    sleep 0.5
-    echo -ne "\r\033[K"
-    echo -ne "$loadingText\r"
-    sleep 0.5
-  done
-
-  echo "$loadingText...COMPLETED"
-}
-
-echo "$USERNAME"
 
 set -e
 
@@ -58,52 +36,41 @@ checkSudo() {
 	fi
 }
 
-zbcnc_sources() {
+setSources() {
 	apt-get update
 	apt-get install -y \
 		apt-transport-https \
 		gnupg \
 		ca-certificates \
 		--no-install-recommends
-
+	mv /etc/apt/sources.list /etc/apt/sources.list.original
 	cat <<-EOF > /etc/apt/sources.list
-	# deb cdrom:[Ubuntu-Server 15.10 _Wily Werewolf_ - Release amd64 (20151021)]/ wily main restricted
-
-	# deb cdrom:[Ubuntu-Server 15.10 _Wily Werewolf_ - Release amd64 (20151021)]/ wily main restricted
-
-	# See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to
-	# newer versions of the distribution.
+	# See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to newer versions of the distribution.
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
 
-	## Major bug fix updates produced after the final release of the
-	## distribution.
+	## Major bug fix updates produced after the final release of the distribution.
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
 
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
-	## team. Also, please note that software in universe WILL NOT receive any
-	## review or updates from the Ubuntu security team.
+	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team.
+	## Also, please note that software in universe WILL NOT receive any review or updates from the Ubuntu security team.
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial universe
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial universe
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
 
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu 
-	## team, and may not be under a free licence. Please satisfy yourself as to 
-	## your rights to use the software. Also, please note that software in 
-	## multiverse WILL NOT receive any review or updates from the Ubuntu
-	## security team.
+	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team, and may not be under a free licence.
+	## Please satisfy yourself as to your rights to use the software. Also, please note that software in multiverse WILL NOT
+	## receive any review or updates from the Ubuntu security team.
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
 
-	## N.B. software from this repository may not have been tested as
-	## extensively as that contained in the main release, although it includes
-	## newer versions of some applications which may provide useful features.
-	## Also, please note that software in backports WILL NOT receive any review
-	## or updates from the Ubuntu security team.
+	## N.B. software from this repository may not have been tested as extensively as that contained in the main release,
+	## although it includes newer versions of some applications which may provide useful features.
+	## Also, please note that software in backports WILL NOT receive any review or updates from the Ubuntu security team.
 	deb http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
 	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
 
@@ -115,53 +82,65 @@ zbcnc_sources() {
 	deb-src http://security.ubuntu.com/ubuntu xenial-security multiverse
 	EOF
 
-	# add docker apt repo
-	cat <<-EOF > /etc/apt/sources.list.d/docker.list
-	deb https://apt.dockerproject.org/repo ubuntu-xenial main
-	EOF
-	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-
-	# add neofetch
-	cat <<-EOF > /etc/apt/sources.list.d/neofetch.list
-	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main 
-	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main 
-	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
-
-	# add ansible
-	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
-	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main 
-	deb-src http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main  
-	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
-
-	# add neovim
-	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
-	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main 
-	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main 
-	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
-
-	# add git-core
-	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
-	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main 
-	deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main 
-	EOF
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-
-	# add virtualbox
-	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
-	deb http://download.virtualbox.org/virtualbox/debian xenial contrib
-	EOF
-	wget -q https://www.vitrualbox/org/downloads/oracle_vbox_2016.asc -O- | apt-key add -
-
 	# turn off translations, speed up apt-get update
 	mkdir -p /etc/apt/apt.conf.d
 	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
 }
+setRepos() {
+	add-apt-repository ppa:dawidd0811/neofetch
+	add-apt-repository ppa:ansible/ansible
+	add-apt-repository ppa:git-core/ppa
+	add-apt-repository ppa:neovim-ppa/unstable
+}
+vboxRepo() {
+	wget -q https://www.vitrualbox/org/downloads/oracle_vbox_2016.asc -O- | apt-key add -
+	# add virtualbox
+	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
+	deb http://download.virtualbox.org/virtualbox/debian xenial contrib
+	EOF
+}
+neofetchRepo() {
+	# add neofetch
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
+	cat <<-EOF > /etc/apt/sources.list.d/neofetch.list
+	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
+	EOF
+}
+ansibleRepo() {
+	# add ansible
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
+	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
+	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
+	EOF
+}
+neovimRepo() {
+	# add neovim
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
+	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
+	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
+	EOF
+}
+gitRepo() {
+	# add git-core
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
+	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
+	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
+	EOF
+}
+dockerRepo() {
+	# add docker apt repo
+	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+	cat <<-EOF > /etc/apt/sources.list.d/docker.list
+	deb http://apt.dockerproject.org/repo ubuntu-xenial main
+	EOF
+}
 
 # installs base packages
-zbcnc_appUtils() {
+deployAppUtils() {
 	apt-get update
 	apt-get upgrade -y
 	apt-get dist-upgrade -y
@@ -271,7 +250,7 @@ zbcnc_appUtils() {
 # if they have your password they can sudo anyways
 # so its pointless
 # i know what the fuck im doing ;)
-zbcnc_fSudo() {
+fSudo() {
 	# add user to sudoers
 	adduser "$USERNAME" sudo
 
@@ -297,8 +276,8 @@ zbcnc_fSudo() {
 
 # installs docker master
 # and adds necessary items to boot params
-zbcnc_docker() {
-	zbcnc_username
+deployDocker() {
+	setUsername
 	apt-get update
 	apt-get install -y linux-image-extra-"$(uname -r)"
 	apt-cache policy docker-engine
@@ -316,7 +295,7 @@ zbcnc_docker() {
 }
 
 # install graphics drivers
-zbcnc_graphics() {
+deployGraphics() {
 	# Display link
 	cd "${MAKEDIR}"
 	git clone https://github.com/DisplayLink/evdi.git
@@ -335,7 +314,7 @@ zbcnc_graphics() {
 }
 
 # install custom scripts/binaries
-zbcnc_scripts() {
+deployScripts() {
 	# install acsciinema
 	curl -sSL https://asciinema.org/install | sh
 
@@ -373,18 +352,18 @@ zbcnc_scripts() {
 }
 
 # install syncthing
-zbcnc_syncthing() {
+deploySyncthing() {
 	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/systemd/system/syncthing@.service > /etc/systemd/system/syncthing@.service
 	systemctl daemon-reload
 	systemctl enable "syncthing@${USERNAME}"
 }
 
 # install stuff for i3 window manager
-zbcnc_wmapps() {
-	zbcnc_compton & showLoading "$@"
-	zbcnc_rofi & showLoading "$@"
-	zbcnc_maim & showLoading "$@"
-	zbcnc_slop & showLoading "$@"
+deployWM() {
+	deployCompton & showLoading "$@"
+	deployRofi & showLoading "$@"
+	deployMaim & showLoading "$@"
+	deploySlop & showLoading "$@"
 	
 	# update clickpad settings
 	mkdir -p /etc/X11/xorg.conf.d/
@@ -399,7 +378,7 @@ zbcnc_wmapps() {
 	# pretty fonts
 	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/fonts/local.conf > /etc/fonts/local.conf
 
-	zbcnc_fonts
+	deployFonts
 	echo "Fonts file setup successfully now run:"
 	echo "	dpkg-reconfigure fontconfig-config"
 	echo "with settings: "
@@ -415,9 +394,8 @@ get_dotfiles() {
 	cd "/home/$USERNAME"
 
 	# install dotfiles from repo
-	git clone git@github.com:affinityskin/dotfiles.git "/home/$USERNAME/.dotfiles"
-	cd "/home/$USERNAME/dotfiles"
-
+	git clone git@github.com:affinityskin/zbcnc-dotfiles.git "/home/$USERNAME/.dotfiles"
+	cd /home/"$USERNAME"/.dotfiles
 	# installs all the things
 	make
 
@@ -452,19 +430,19 @@ get_dotfiles() {
 	sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
 	sudo update-alternatives --config editor
 
-	mkdir -p ~/Pictures
-	mkdir -p ~/Torrents
+	mkdir -p /home/"$USERNAME"/Pictures
+	mkdir -p /home/"$USERNAME"/Torrents
 	)
 }
 
-zbcnc_vbox() {
+deployVBox() {
 	apt-get update
 	apt-get install -y \
 		virtualbox-5.1
 	--no-install-recommends
 }
 
-zbcnc_vagrant() {
+deployVagrant() {
 	VAGRANT_VERSION=1.8.4
 
 	# if we are passing the version
@@ -477,7 +455,7 @@ zbcnc_vagrant() {
 	echo Checking for virtualbox: "$PKG_OK"
 	if [ "" == "$PKG_OK" ]; then
 		echo "No virtualbox. Installing virtualbox."
-		zbcnc_vbox
+		deployVBox
 	fi
 
 	tmpdir=$(mktemp -d)
@@ -497,7 +475,7 @@ zbcnc_vagrant() {
 
 
 # xorg install command
-zbcnc_xorg() {
+deployXorg() {
 echo "Installing Xorg"
 	apt-get update
 	apt-get install -y \
@@ -511,12 +489,12 @@ echo "Installing Xorg"
 		mesa-common-dev \
 		glew-utils
 		zbcnc_xfixes & showLoading
-		zbcnc_xedge & showLoading
-		zbcnc_xtitle & showLoading
-		zbcnc_xrmUtil & showLoading
+		deployXedgewarp & showLoading
+		deployXtitle & showLoading
+		deployXRMutil & showLoading
 }
 
-zbcnc_xDeps() {
+deployXdeps() {
 		libx11-dev \
 		libxcomposite-dev \
 		libxdamage-dev \
@@ -575,7 +553,7 @@ zbcnc_xDeps() {
 		libxcb-util0-dev \
 		libimlib2-dev \
 		libxrandr-dev \
-		libxfixes-dev \
+a		libxfixes-dev \
 		libxext-dev \
 		libgl1-mesa-dev \
 		libxrender-dev \
@@ -610,7 +588,7 @@ zbcnc_xfixes() {
 	make install
 }
 
-zbcnc_xedge() {
+deployXedgewarp() {
 	echo "Compiling xEdgewarp"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/xedgewarp.git
@@ -620,17 +598,17 @@ zbcnc_xedge() {
 	make install
 }
 
-zbcnc_xtitle() {
+deployXtitle() {
 	echo "Compiling xTitle"
 	cd "${MAKEDIR}"
 	git clone https://github.com/baskerville/xtitle.git
-	sleep 1
+a	sleep 1
 	cd "${MAKEDIR}"/xtitle
 	make
 	make install
 }
 
-zbcnc_xrmUtil() {
+deployXRMutil() {
 	echo "Compiling XCB Util-XRM Module"
 	cd "${MAKEDIR}"
 	git clone --recursive https://github.com/Airblader/xcb-util-xrm.git
@@ -639,7 +617,7 @@ zbcnc_xrmUtil() {
 	make
 	make install
 }
-zbcnc_compton() {
+deployCompton() {
 	echo "Installing Compton"
 	apt-get install -y \
 	cd "${MAKEDIR}"
@@ -650,7 +628,7 @@ zbcnc_compton() {
 	make install clean
 }
 
-zbcnc_i3Deps() {
+deployI3deps() {
 echo "Adding i3 Keyring"
 apt-get --allow-unauthenticated install -y sur5r-keyring
 apt-get update
@@ -666,7 +644,7 @@ apt-get install -y \
 	libjson-xs-perl
 }
 
-zbcnc_i3wm() {
+deployI3wm() {
 	echo "Compiling i3 Gaps"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3.git
@@ -678,12 +656,12 @@ zbcnc_i3wm() {
 	make
 	sleep 1
 	make install
-	zbcnc_i3blocks & showLoading "$@"
-	zbcnc_i3status & showLoading "$@"
-	zbcnc_i3lock & showLoading "$@"
+	deployI3blocks & showLoading "$@"
+	deployI3status & showLoading "$@"
+	deployI3lock & showLoading "$@"
 
 }
-zbcnc_i3blocks() {
+deployI3blocks() {
 	echo "Installing i3 Block Gaps"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3blocks-gaps.git
@@ -695,7 +673,7 @@ zbcnc_i3blocks() {
 	make install
 }
 
-zbcnc_i3status() {
+deployI3status() {
 	echo "compiling i3status"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3status.git
@@ -705,7 +683,7 @@ zbcnc_i3status() {
 	make install
 }
 
-zbcnc_i3lock() {
+deployI3lock() {
 	echo "compiling i3lock"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3lock.git
@@ -715,7 +693,7 @@ zbcnc_i3lock() {
 	make install
 }
 
-zbcnc_rofi() {
+deployRofi() {
 	echo "Installing Rofi"
 	cd "${MAKEDIR}"
 	git clone https://github.com/DaveDavenport/rofi.git
@@ -738,16 +716,16 @@ zbcnc_rofi() {
 	make install clean
 }
 
-zbcnc_nvm() {
+deployNVM() {
 	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.3/install.sh | bash
 }
 
-zbcnc_govm() {
+deployGOVM() {
 	curl -L git.io/govm | python - setup
 }
 
 # install/update golang from source
-zbcnc_golang() {
+deployGolang() {
 	export GO_VERSION=1.6.2
 	export GO_SRC=/usr/local/go
 
@@ -860,7 +838,7 @@ zbcnc_golang() {
 done
 )
 }
-zbcnc_fonts() {
+deployFonts() {
 	sudo apt-get update
 	echo "Installing Powerline fonts & Font Awesome"
 	sudo apt-get install -y \
@@ -901,7 +879,7 @@ zbcnc_fonts() {
 	sudo mkfontscale /usr/share/fonts/
 	sudo mkfontdir /usr/share/fonts/
 }
-zbcnc_pyDeps() {
+deployPydeps() {
 	echo "Installing Python Pakcages"
 	sudo apt-get install -y \
 		python-pip \
@@ -932,9 +910,9 @@ zbcnc_pyDeps() {
 	pip3 install basiciw
 	pip3 install pillow
 }
-zbcnc_python() {
+deployPython() {
 	local system="$1"
-	zbcnc_pydeps
+	deployPydeps
 	if [ "$system" == icdiff ]; then
 		pip install icdiff
 	elif [ "$system" == ansible ]; then
@@ -944,7 +922,7 @@ zbcnc_python() {
 	fi
 }
 
-zbcnc_maim() {
+deployMaim() {
 echo "Setting Maim"
 cd "${MAKEDIR}"
 git clone https://github.com/naelstrof/maim.git
@@ -954,7 +932,7 @@ make
 sudo make install
 }
 
-zbcnc_slop() {
+deploySlop() {
 echo "Setting Slop"
 cd "${MAKEDIR}"
 git clone https://github.com/naelstrof/slop.git
@@ -964,17 +942,30 @@ make
 sudo make install
 }
 
-zbcnc_dotfiles() {
+deployDotfiles() {
+	local dot="$1"
+	if [ "$dot" == user ]; then
+		setUsername
+		linkUserdots
+	elif [ "$dot" == root ]; then
+		checkSudo
+		linkRootdots
+	else
+		echo "Please try Again"
+	fi
+}
+
+linkUserdots() {
 cd "${HOME}"
 cp "${HOME}"/.bashrc "${HOME}"/.bashrc.bu
 ln -snf "${DOTFILES}"/.bashrc
 ln -snf "${DOTFILES}"/.bash_profile
 ln -snf "${DOTFILES}"/.bash.d
-mv "${HOME}"/.config "${HOME}"/.config-bu
+#mv "${HOME}"/.config "${HOME}"/.config-bu
 ln -snf "${DOTFILES}"/.config
 ln -snf "${DOTFILES}"/.i3
 ln -snf "${DOTFILES}"/.vim
-#ln -snf "${DOTFILES}"/.weechat
+ln -snf "${DOTFILES}"/.weechat
 ln -snf "${DOTFILES}"/scripts "${HOME}"/.scripts
 ln -snf "${DOTFILES}"/.compton.conf
 ln -snf "${DOTFILES}"/.gitconfig
@@ -986,7 +977,7 @@ ln -snf "${DOTFILES}"/.Xresources
 
 source ~/.bashrc
 }
-zbcnc_rootdots() {
+linkRootdots() {
 cd "${ROOTDIR}"
 # folders
 ln -snf "${ROOTDOTS}"/.bash.d
@@ -1013,7 +1004,7 @@ chown -R root:root "${ROOTDIR}"/scripts
 chown -R root:root "${ROOTDIR}"/.xinitrc
 chown -R root:root "${ROOTDIR}"/.Xresources
 }
-zbcnc_termite() {
+deployTermite() {
 	cd "${MAKEDIR}"
 	git clone https://github.com/affinityskin/vte-ng.git
 	sudo apt-get install -y g++ libgtk-3-dev gtk-doc-tools gnutls-bin valac libglib3.0-cil-dev libgnutls28-dev libgirepository1.0-dev libxml2-utils gperf libglib-object-introspection-perl
@@ -1034,20 +1025,20 @@ zbcnc_termite() {
 	cd "${MAKEDIR}"/termite && sudo ./deskopen termite.desktop
 }
 
-zbcnc_sublime() {
+deploySublime() {
 	cd "${MAKEDIR}"
 	wget https://download.sublimetext.com/sublime-text_build-3114_amd64.deb
 	sudo dpkg -i "${MAKEDIR}"/sublime-text_build-3114_amd64.deb
 	sleep 1
 	sudo mv /usr/bin/subl /usr/bin/sublime
 }
-zbcnc_atom() {
+deployAtom() {
 	cd "${MAKEDIR}"
 	curl -L https://atom.io/download/deb -o atom.deb
 	dpkg -i atom.deb
 }
 
-zbcnc_minify() {
+deployMinify() {
 	# Sublime Minify Dependencies
 	npm install -g \
 		clean-css \
@@ -1059,7 +1050,7 @@ zbcnc_minify() {
 		svgo
 }
 
-zbcnc_yeoman(){
+deployYeoman(){
 	npm install -g \
 		gulp-cli \
 		bower \
@@ -1069,12 +1060,33 @@ zbcnc_yeoman(){
 		browser-sync
 }
 
+showLoading() {
+  mypid=$!
+  loadingText=$1
+
+  echo -ne "$loadingText\r"
+
+  while kill -0 $mypid 2>/dev/null; do
+    echo -ne "$loadingText.\r"
+    sleep 0.5
+    echo -ne "$loadingText..\r"
+    sleep 0.5
+    echo -ne "$loadingText...\r"
+    sleep 0.5
+    echo -ne "\r\033[K"
+    echo -ne "$loadingText\r"
+    sleep 0.5
+  done
+
+  echo "$loadingText...COMPLETED"
+}
+
 usage() {
 	echo -e "zeroBytes Comand & Controler\n\tAn installation helper for a debian laptop setup\n"
 	echo "Usage:"
 	echo "  sources                     - setup sources & install base pkgs"
 	echo "  i3wm                        - install i3 window manager"
-	echo "  dotfiles                    - link dotfiles"
+	echo "  dotfiles {user,root}        - link dotfiles"
 	echo "  docker                      - install docker"
 	echo "  python {icdiff,ansible}     - install icdiff or Ansible"
 	echo "  golang                      - install golang and packages"
@@ -1085,6 +1097,7 @@ usage() {
 
 main() {
 	local cmd=$1
+	local subc=$2
 
 	if [[ -z "$cmd" ]]; then
 		usage
@@ -1093,45 +1106,46 @@ main() {
 
 	if [[ $cmd == "sources" ]]; then
 		checkSudo
-		set_username
-		zbcnc_vars
-		zbcnc_sources
-		zbcnc_appUtils
-		zbcnc_graphics
+		setUsername
+		setVars
+		setSources
+		setRepos
+		deployAppUtils
+		deployGraphics
 
-	elif [[ $cmd == "graphics" ]]; then
-		check_is_sudo
-		zbcnc_graphics "$2"
+	elif [[ $cmd == "run" ]]; then
+		checkSudo
+		"$subc"
 
 	elif [[ $cmd == "python" ]]; then
-		check_is_sudo
-		zbcnc_python "$2"
+		checkSudo
+		deployPython "$2"
 
 	elif [[ $cmd == "i3wm" ]]; then
-		check_is_sudo
-		zbcnc_xDeps & showLoading "$@"
-		zbcnc_xorg & showLoading "$@"
-		zbcnc_i3Deps & showLoading "$@"
-		zbcnc_i3wm "$@" & showLoading "$@"
-		zbcnc_wmapps "$@" & showLoading "$@"
+		checkSudo
+		deployXdeps & showLoading "$@"
+		deployXorg & showLoading "$@"
+		deployI3deps & showLoading "$@"
+		deployI3wm "$@" & showLoading "$@"
+		deployWM "$@" & showLoading "$@"
 
 	elif [[ $cmd == "dotfiles" ]]; then
-		zbcnc_username
-		zbcnc_dotfiles
-		zbcnc_rootdots
+		deployDotfiles "$2"
 		#get_dotfiles
 	elif [[ $cmd == "docker" ]]; then
-		zbcnc_docker "$2"
+		deployDocker "$2"
 	elif [[ $cmd == "fSudo" ]]; then
-		zbcnc_fSudo
+		checkSudo
+		setUsername
+		fSudo
 	elif [[ $cmd == "golang" ]]; then
-		zbcnc_golang "$2"
+		deployGolang "$2"
 	elif [[ $cmd == "scripts" ]]; then
-		zbcnc_scripts
+		deployScripts
 	elif [[ $cmd == "syncthing" ]]; then
-		zbcnc_syncthing
+		deploySyncthing
 	elif [[ $cmd == "vagrant" ]]; then
-		zbcnc_vagrant "$2"
+		deployVagrant "$2"
 
 	else
 		usage
