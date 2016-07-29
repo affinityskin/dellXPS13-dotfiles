@@ -24,6 +24,14 @@ alias l='clear'
 alias x='exit'
 alias i='sudo -i'
 
+# Git
+alias g='git'
+alias gs='git status'
+alias ga='git add $1'
+alias gr='git rm $1'
+alias gm='git commit -m "upload"'
+alias gp='git push origin $1'
+
 # apt-get
 alias update='sudo apt-get update'
 alias upgrade='sudo apt-get upgrade -y'
@@ -31,13 +39,13 @@ alias dist-upgrade='sudo apt-get dist-upgrade -y'
 alias install='sudo apt-get install -y'
 alias remove='sudo apt-get remove --purge -y'
 alias clean='sudo apt-get autoclean -y && sudo apt-get autoremove -y'
-alias search='apt-cache search'
+alias search='apt-cache search $@'
 
 # commands
 alias cp='sudo cp -av'
 alias mv='sudo mv'
 alias rm='sudo rm -rf'
-alias chown='sudo chown -R loki:loki'
+alias chown='sudo chown -R $1:$1'
 alias chmod='sudo chmod -R'
 alias shutdown='sudo shutdown now'
 alias reboot='sudo reboot'

@@ -1,139 +1,127 @@
 #!/bin/bash
 #
-#	zeroBytes Command & Controller
+#   zeroBytes Command & Controller Center
 #
-#	Author:			zeroBytes
+#   Author:         zeroBytes
 #
-#	Distribution:	Ubuntu Xenial 16.04.1
+#   Distribution:   Ubuntu Xenial 16.04.1
 #
-#	Hardware:		Dell XPS 13 (9343)
+#   Hardware:       Dell XPS 13 (9343)
 #
-#	Location:		/usr/local/bin/zbcnc
+#   Location:       /usr/local/bin/zbcnc
 #
-########################################################################
+#######################################################################
 
 set -e
 export DEBIAN_FRONTEND=noninteractive
 
-# setup sudo for a user because fuck typing that shit all the time just have a decent password and lock your computer when you aren't using 
-# it if they have your password they can sudo anyways so its pointless i know what the fuck im doing.
-fSudo() {
-	checkSudo
-	setVars
+usage() {
+cat <<-EOF                                               
+.........................................................................................
+.........................................................................................
+.....................................  _ )..... |........................................
+......................_  /  -_)  _|_ \ _ \ |  |  _|  -_)(_-< ............................
+......................___|\___|_|\___/___/\_, |\__|\___|___/ ............................
+..........................................___/ ..........................................
+.............. _______....................................... __ ........................
+..............|   _   .-----.--------.--------.---.-.-----.--|  |........................
+..............|.  1___|  _  |        |        |  _  |     |  _  |........................
+..............|.  |___|_____|__|__|__|__|__|__|___._|__|__|_____|........................
+..............|:  1   |..................................................................
+..............|::.. . |.......................... __ ....................................
+..............'-------'.......... .---.-.-----.--|  |....................................
+..................................|  _  |     |  _  |....................................
+..................................|___._|__|__|_____|....................................
+.........................................................................................
+.................................. __............. __ __ ..... _______ ..................
+..................----.-----.-----|  |_.----.-----|  |  .-----|   _   \ .................
+.................|  __|  _  |     |   _|   _|  _  |  |  |  -__|.  l   / .................
+.................|____|_____|__|__|____|__| |_____|__|__|_____|.  _   |..................
+..............................................................|:  |   |..................
+..............................................................|::.|:. |..................
+.................. ZEROBYTES: COMMAND AND CONTROLLER .........'--- ---'..................
+..................  An configuration helper app for .....................................
+..................  installing debian based systems .....................................
+..................  on a DELL XPS 13 (9343) laptop  .....................................
+.........................................................................................
+.........................................................................................
+.........................................................................................
+...................................."I am not responsible for your breaking..............
+................................................your manchine...just saying..............
+.........................................................................................
+.........................................................................................
+... Command {Sub-Command}:                        Usage:                              ...
+... - repos                                     - setup sources & install base pkgs   ...
+... - dotfiles                                                                        ...
+...     {user,root}                             - link dotfiles                       ...
+... - deps                                                                            ...
+...     {all,repos,hardware}                    - install icdiff or Ansible           ...
+... - deploy                                                                          ...
+...     {fonts, xorg, i3}                       - install docker                      ...
+... - install                                                                         ...
+...     {apps, }                                - install golang and packages         ...
+... - scripts                                   - install scripts                     ...
+... - syncthing                                 - install syncthing                   ...
+... - vagrant                                   - install vagrant and virtualbox      ...
+... - fSudo                                     - because fuck typing sudo            ...
+.........................................................................................
+.........................................................................................
+EOF
+}
+main() {
+    local cmd=$1
+    local subc=$2
+    
+    if [[ -z "$cmd" ]]; then
+        usage
+        exit 1
+    fi
 
-	# add user to sudoers
-	adduser "$USERNAME" sudo
+    if [[ $cmd == "sources" ]]; then
+        checkSudo
+        setUsername
+        setVars
+        setSources
+        setRepos
+        deployAppUtils
+        configHardware
 
-	# add user to systemd groups then you wont need sudo to view logs and shit
-	gpasswd -a "$USERNAME" systemd-journal
-	gpasswd -a "$USERNAME" systemd-network
+    elif [[ $cmd == "run" ]]; then
+        "$subc"
 
-	# add go path to secure path
-	{ \
-		echo -e 'Defaults	secure_path="/usr/local/go/bin:/home/loki/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'; \
-		echo -e 'Defaults	env_keep += "ftp_proxy http_proxy https_proxy no_proxy GOPATH EDITOR"'; \
-		echo -e "${USERNAME} ALL=(ALL) NOPASSWD:ALL"; \
-		echo -e "${USERNAME} ALL=NOPASSWD: /sbin/ifconfig, /sbin/ifup, /sbin/ifdown, /sbin/ifquery"; \
-	} >> /etc/sudoers
+    elif [[ $cmd == "python" ]]; then
+        checkSudo
+        deployPython "$2"
 
-	# setup downloads folder as tmpfs that way things are removed on reboot
-	mkdir -p "/home/$USERNAME/Downloads"
-	echo -e "\n# tmpfs for downloads\ntmpfs\t/home/${USERNAME}/Downloads\ttmpfs\tnodev,nosuid,size=2G\t0\t0" >> /etc/fstab
-}
+    elif [[ $cmd == "i3wm" ]]; then
+        checkSudo
+        showLoading "$@" & deployXdeps
+        showLoading "$@" & deployXorg
+        showLoading "$@" & deployI3deps
+        showLoading "$@" & deployI3wm "$@"
+        showLoading "$@" & deployWM "$@"
 
-updateRepos() {
-	apt-get update
-}
-upgradeSystem() {
-	apt-get upgrade -y
-	apt-get dist-upgrade -y
-}
-setRepos() {
-	checkSudo
-	source payload/zbcncRepo
-	setTranslations
-	setSources
-	vboxRepo
-	ansibleRepo
-	neovimRepo
-	neofetchRepo
-	numixRepo
-	dockerRepo
-	atomRepo
-	firefoxRepo
-	chromeRepo
-}
-configHardware() {
-	checkSudo
-	setVars
-	source payload/zbcncHardware
-	#configDisplaylink
-	configBluetooth
-	configSound
-	configClickpad
-}
-installDeps() {
-	checkSudo
-	setVars
-	source payload/zbcncDeps
-	updateRepos
-	upgradeSystem
-	deployUtils
-	deployXorgDeps
-	cleanAptInstall
-}
-installFonts() {
-	checkSudo
-	source payload/zbcncFonts
-	deployFonts
-	configFonts
-	echo "Fonts file setup successfully now run:"
-	echo "	dpkg-reconfigure fontconfig-config"
-	echo "with settings: "
-	echo "	Autohinter, Automatic, No."
-	echo "Run: "
-	echo "	dpkg-reconfigure fontconfig"
-}
-InstallXorg() {
-	checkSudo
-	setUsername
-	source payload/zbcncXorg
-	deployXorg
-	deployXfixes
-	deployXedgewarp
-	deployXtitle
-	deployXRMutil
-}
-installI3wm() {
-	checkSudo
-	setUsername
-	sources payload/zbcncI3wm
-	deployI3wm
-	deployCompton
-	deployRofi
-	deployMaim
-	deploySlop
-}
-installApps() {
-	checkSudo
-	setVars
-	source payload/zbcncApps
-	source payload/zbcncScripts
-	deployBaseApps
-	deployPython
-	deployTermite
-	deployDocker
-	deployScripts
-	deployVBox
-	deployVagrant
-}
-installTexteditors() {
-	deploySublime
-	deployAtom
-	deployGolang
-	deployMinify
-	deployYeoman
+    elif [[ $cmd == "dotfiles" ]]; then
+        deployDotfiles "$2"
+        #get_dotfiles
+    elif [[ $cmd == "docker" ]]; then
+        deployDocker "$2"
+    elif [[ $cmd == "fSudo" ]]; then
+        checkSudo
+        setUsername
+        fSudo
+    elif [[ $cmd == "golang" ]]; then
+        deployGolang "$2"
+    elif [[ $cmd == "scripts" ]]; then
+        deployScripts
+    elif [[ $cmd == "syncthing" ]]; then
+        deploySyncthing
+    elif [[ $cmd == "vagrant" ]]; then
+        deployVagrant "$2"
 
+    else
+        usage
+    fi
 }
 showLoading() {
   mypid=$!
@@ -156,91 +144,143 @@ showLoading() {
   echo "$loadingText...COMPLETED"
 }
 setUsername() {
-	echo "Please enter your user name"
-	read -p 'Username: ' USERNAME
-	USERNAME="${USERNAME}"
-	export USERNAME
-	echo "$USERNAME"
+    echo "Please enter your user name"
+    read -p 'Username: ' USERNAME
+    USERNAME="${USERNAME}"
+    export USERNAME
+    echo "$USERNAME"
 }
 
 setVars() {
-	cp "$HOME"/zbcnc/dots/vars "$HOME"/.vars
-	source "$HOME"/.vars
+    cp "$HOME"/zbcnc/dots/vars "$HOME"/.vars
+    source "$HOME"/.vars
 }
 checkSudo() {
-	if [ "$EUID" -ne 0 ]; then
-		echo "Please run as root."
-		exit
-	fi
+    if [ "$EUID" -ne 0 ]; then
+        echo "Please run as root."
+        exit
+    fi
 }
-usage() {
-	echo -e "zeroBytes Comand & Controler\n\tAn installation helper for a debian laptop setup\n"
-	echo "Usage:"
-	echo "  repos                       - setup sources & install base pkgs"
-	echo "  dotfiles {user,root}        - link dotfiles"
-	echo "  deps {all,repos,hardware}   - install icdiff or Ansible"
-	echo "  deploy {fonts, xorg, i3}    - install docker"
-	echo "  install {apps, }                      - install golang and packages"
-	echo "  scripts                     - install scripts"
-	echo "  syncthing                   - install syncthing"
-	echo "  vagrant                     - install vagrant and virtualbox"
-	echo "  fSudo                       - because fuck typing sudo"
+
+# setup sudo for a user because fuck typing that shit all the time just have a decent password and lock your computer when you aren't using 
+# it if they have your password they can sudo anyways so its pointless i know what the fuck im doing.
+fSudo() {
+    checkSudo
+    setVars
+
+    # add user to sudoers
+    adduser "$USERNAME" sudo
+
+    # add user to systemd groups then you wont need sudo to view logs and shit
+    gpasswd -a "$USERNAME" systemd-journal
+    gpasswd -a "$USERNAME" systemd-network
+
+    # add go path to secure path
+    { 
+        echo -e 'Defaults   secure_path="/usr/local/go/bin:/home/loki/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'; \
+        echo -e 'Defaults   env_keep += "ftp_proxy http_proxy https_proxy no_proxy GOPATH EDITOR"'; \
+        echo -e "${USERNAME} ALL=(ALL) NOPASSWD:ALL"; \
+        echo -e "${USERNAME} ALL=NOPASSWD: /sbin/ifconfig, /sbin/ifup, /sbin/ifdown, /sbin/ifquery"; \
+    } >> /etc/sudoers
+
+    # setup downloads folder as tmpfs that way things are removed on reboot
+    mkdir -p "/home/$USERNAME/Downloads"
+    echo -e "\n# tmpfs for downloads\ntmpfs\t/home/${USERNAME}/Downloads\ttmpfs\tnodev,nosuid,size=2G\t0\t0" >> /etc/fstab
 }
-main() {
-	local cmd=$1
-	local subc=$2
 
-	if [[ -z "$cmd" ]]; then
-		usage
-		exit 1
-	fi
+updateRepos() {
+    apt-get update
+}
+upgradeSystem() {
+    apt-get upgrade -y
+    apt-get dist-upgrade -y
+}
+setRepos() {
+    checkSudo
+    source payload/zbcncRepo
+    setTranslations
+    setSources
+    vboxRepo
+    ansibleRepo
+    neovimRepo
+    neofetchRepo
+    numixRepo
+    dockerRepo
+    atomRepo
+    firefoxRepo
+    chromeRepo
+}
+configHardware() {
+    checkSudo
+    setVars
+    source payload/zbcncHardware
+    #configDisplaylink
+    configBluetooth
+    configSound
+    configClickpad
+}
+installDeps() {
+    checkSudo
+    setVars
+    source payload/zbcncDeps
+    updateRepos
+    upgradeSystem
+    deployUtils
+    deployXorgDeps
+    cleanAptInstall
+}
+installFonts() {
+    checkSudo
+    source payload/zbcncFonts
+    deployFonts
+    configFonts
+    echo "Fonts file setup successfully now run:"
+    echo "  dpkg-reconfigure fontconfig-config"
+    echo "with settings: "
+    echo "  Autohinter, Automatic, No."
+    echo "Run: "
+    echo "  dpkg-reconfigure fontconfig"
+}
+InstallXorg() {
+    checkSudo
+    setUsername
+    source payload/zbcncXorg
+    deployXorg
+    deployXfixes
+    deployXedgewarp
+    deployXtitle
+    deployXRMutil
+}
+installI3wm() {
+    checkSudo
+    setUsername
+    sources payload/zbcncI3wm
+    deployI3wm
+    deployCompton
+    deployRofi
+    deployMaim
+    deploySlop
+}
+installApps() {
+    checkSudo
+    setVars
+    source payload/zbcncApps
+    source payload/zbcncScripts
+    deployBaseApps
+    deployPython
+    deployTermite
+    deployDocker
+    deployScripts
+    deployVBox
+    deployVagrant
+}
+installTexteditors() {
+    deploySublime
+    deployAtom
+    deployGolang
+    deployMinify
+    deployYeoman
 
-	if [[ $cmd == "sources" ]]; then
-		checkSudo
-		setUsername
-		setVars
-		setSources
-		setRepos
-		deployAppUtils
-		configHardware
-
-	elif [[ $cmd == "run" ]]; then
-		checkSudo
-		"$subc"
-
-	elif [[ $cmd == "python" ]]; then
-		checkSudo
-		deployPython "$2"
-
-	elif [[ $cmd == "i3wm" ]]; then
-		checkSudo
-		showLoading "$@" & deployXdeps
-		showLoading "$@" & deployXorg
-		showLoading "$@" & deployI3deps
-		showLoading "$@" & deployI3wm "$@"
-		showLoading "$@" & deployWM "$@"
-
-	elif [[ $cmd == "dotfiles" ]]; then
-		deployDotfiles "$2"
-		#get_dotfiles
-	elif [[ $cmd == "docker" ]]; then
-		deployDocker "$2"
-	elif [[ $cmd == "fSudo" ]]; then
-		checkSudo
-		setUsername
-		fSudo
-	elif [[ $cmd == "golang" ]]; then
-		deployGolang "$2"
-	elif [[ $cmd == "scripts" ]]; then
-		deployScripts
-	elif [[ $cmd == "syncthing" ]]; then
-		deploySyncthing
-	elif [[ $cmd == "vagrant" ]]; then
-		deployVagrant "$2"
-
-	else
-		usage
-	fi
 }
 
 main "$@"

@@ -1,0 +1,69 @@
+usage
+main
+
+setUsername
+setVars
+checkSudo
+showLoading
+fSudo
+
+updateRepos
+upgradeSystem
+
+setRepos
+	setTranslations
+	setSources
+	vboxRepo
+	ansibleRepo
+	neovimRepo
+	neofetchRepo
+	numixRepo
+	dockerRepo
+	atomRepo
+	firefoxRepo
+	chromeRepo
+
+configHardware
+	#configDisplaylink
+	configBluetooth
+	configSound
+	configClickpad
+
+installDeps
+	deployUtils
+	deployXorgDeps
+	cleanAptInstall
+
+installFonts
+	deployFonts
+	configFonts
+
+InstallXorg
+	deployXorg
+	deployXfixes
+	deployXedgewarp
+	deployXtitle
+	deployXRMutil
+
+installI3wm
+	deployI3wm
+	deployCompton
+	deployRofi
+	deployMaim
+	deploySlop
+
+installApps
+	deployBaseApps
+	deployPython
+	deployTermite
+	deployDocker
+	deployScripts
+	deployVBox
+	deployVagrant
+
+installTexteditors
+	deploySublime
+	deployAtom
+	deployGolang
+	deployMinify
+	deployYeoman
