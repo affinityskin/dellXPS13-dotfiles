@@ -9,9 +9,6 @@ bin:
 		sudo ln -sf $$file /usr/local/bin/$$f; \
 	done
 	sudo ln -sf $(CURDIR)/bin/browser-exec /usr/local/bin/xdg-open; \
-	setVars
-	sudo ln -snf "$HOME"/.zbcnc/zbcnc /usr/local/bin/zbcnc
-	sudo chmod +x /usr/local/bin/zbcnc
 
 dotfiles:
 	# add aliases for dotfiles

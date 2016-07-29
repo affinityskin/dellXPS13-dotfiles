@@ -1,4 +1,5 @@
-# vim:filetype=sh
+#!/bin/bash
+## vim:filetype=sh
 function __parse_git_branch() {
     local branch stat
 
@@ -14,13 +15,13 @@ function __parse_git_branch() {
 function __parse_git_dirty {
     local status dirty untracked ahead newfile renamed deleted bits
 
-    status=`git status 2>&1 | tee`
-    dirty=`echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?"`
-    untracked=`echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?"`
-    ahead=`echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?"`
-    newfile=`echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?"`
-    renamed=`echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?"`
-    deleted=`echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?"`
+    status=$(git status 2>&1 | tee)
+    dirty=$(echo -n "${status}" 2> /dev/null | grep "modified:" &> /dev/null; echo "$?")
+    untracked=$(echo -n "${status}" 2> /dev/null | grep "Untracked files" &> /dev/null; echo "$?")
+    ahead=$(echo -n "${status}" 2> /dev/null | grep "Your branch is ahead of" &> /dev/null; echo "$?")
+    newfile=$(echo -n "${status}" 2> /dev/null | grep "new file:" &> /dev/null; echo "$?")
+    renamed=$(echo -n "${status}" 2> /dev/null | grep "renamed:" &> /dev/null; echo "$?")
+    deleted=$(echo -n "${status}" 2> /dev/null | grep "deleted:" &> /dev/null; echo "$?")
     bits=''
     if [ "${renamed}" == "0" ]; then
         bits=">${bits}"
@@ -74,3 +75,6 @@ if [[ ! "$PROMPT_COMMAND" == *__prompt* ]]; then
             PROMPT_COMMAND='__prompt;'$'\n'"$PROMPT_COMMAND" ;;
     esac
 fi
+
+read alt_sep
+echo "$alt_sep"

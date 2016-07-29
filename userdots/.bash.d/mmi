@@ -1,1 +1,2 @@
+#!bin/bash
 alias mmi="make && sudo make install"

@@ -1,2 +1,3 @@
+#!bin/bash
 # File suffixes to be ignored in autocompletion
 export FIGNORE=".o:.trs:~"

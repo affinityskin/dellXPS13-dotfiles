@@ -1,1 +1,2 @@
-alias cdc="cd $HOME/.config"
+#!bin/bash
+alias cdc=cd "$HOME"/.config

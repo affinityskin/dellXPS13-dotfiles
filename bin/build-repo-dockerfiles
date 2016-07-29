@@ -16,7 +16,9 @@ build_repo_dockerfile(){
 	local orig=$1
 	local user=${orig%/*}
 	local repo=${orig#*/}
-	local tmpdir=$(mktemp -d)
+	local tmpdir
+	tmpdir="$(mktemp -d)"
+	export tmpdir 
 	local suite=latest
 	local image=${REGISTRY_PREFIX}/${repo}:${suite}
 
@@ -38,14 +40,14 @@ build_repo_dockerfile(){
 	set -x
 	git clone --depth 1 "git@github.com:${user}/${repo}.git" "$tmpdir"
 	cd "$tmpdir"
-	docker build --rm --force-rm -t ${image} .
+	docker build --rm --force-rm -t "${image}" .
 	)
 
 	echo "                       ---                                   "
 	echo "Successfully built ${image}"
 	echo "                       ---                                   "
 
-	docker push --disable-content-trust=false ${image}
+	docker push --disable-content-trust=false "${image}"
 
 	# also push the weather-server image
 	if [[ "${user}/${repo}" == "jfrazelle/weather" ]]; then
@@ -57,14 +59,14 @@ build_repo_dockerfile(){
 		(
 		set -x
 		cd "$tmpdir"
-		docker build --rm --force-rm -t ${image} server
+		docker build --rm --force-rm -t "${image}" server
 		)
 
 		echo "                       ---                                   "
 		echo "Successfully built ${image}"
 		echo "                       ---                                   "
 
-		docker push --disable-content-trust=false ${image}
+		docker push --disable-content-trust=false "${image}"
 	fi
 
 
@@ -83,10 +85,10 @@ jishi/node-sonos-http-api
 kylemanna/docker-openvpn
 )
 
-: ${REGISTRY_PREFIX:=jess}
+: "${REGISTRY_PREFIX:=jess}"
 
 main(){
-	for r in ${repos[@]}; do
+	for r in "${repos[@]}"; do
 		build_repo_dockerfile "$r"
 	done
 }

@@ -199,3 +199,55 @@ deployTermite() {
 	EOF
 	echo "'Run ~/./deskopen termite.desktop' after next reboot"
 }
+deployGolang() {
+	checkSudo
+	setVars
+	source payload/zbcncGolang
+}
+
+deployDotfiles() {
+	local dot="$1"
+	if [ "$dot" == user ]; then
+		setUsername
+		linkUserdots
+	elif [ "$dot" == root ]; then
+		checkSudo
+		linkRootdots
+	else
+		echo "Please try Again"
+	fi
+}
+deploySublime() {
+	cd "${MAKEDIR}"
+	wget https://download.sublimetext.com/sublime-text_build-3114_amd64.deb
+	sudo dpkg -i "${MAKEDIR}"/sublime-text_build-3114_amd64.deb
+	sleep 1
+	sudo mv /usr/bin/subl /usr/bin/sublime
+}
+deployAtom() {
+	cd "${MAKEDIR}"
+	curl -L https://atom.io/download/deb -o atom.deb
+	dpkg -i atom.deb
+}
+
+deployMinify() {
+	# Sublime Minify Dependencies
+	npm install -g \
+		clean-css \
+		uglifycss \
+		js-beautify \
+		html-minifier \
+		uglify-js \
+		minjson \
+		svgo
+}
+
+deployYeoman(){
+	npm install -g \
+		gulp-cli \
+		bower \
+		yo \
+		browserify \
+		assemble \
+		browser-sync
+}

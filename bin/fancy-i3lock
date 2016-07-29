@@ -29,7 +29,7 @@ scrot $IMAGE
 
 docker run --rm \
 	-v $IMAGE:$IMAGE \
-	-v $HOME/Pictures/lock.png:/root/lock.png \
+	-v "$HOME"/Pictures/lock.png:/root/lock.png \
 	jess/imagemagick \
 	sh -c "convert $IMAGE -brightness-contrast -30x10 -level 0%,100%,0.6 -blur $BLURTYPE -gravity center - | composite -gravity center /root/lock.png - $IMAGE"
 

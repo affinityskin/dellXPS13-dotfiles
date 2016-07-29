@@ -1,3 +1,4 @@
+#!bin/bash
 # Git Completion
 if [ -f ~/.git-completion.bash ]; then
   . ~/.git-completion.bash
