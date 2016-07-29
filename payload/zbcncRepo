@@ -12,6 +12,22 @@
 #
 ########################################################################
 
+setTranslations() {
+	# turn off translations, speed up apt-get update
+	mkdir -p /etc/apt/apt.conf.d
+	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
+}
+setSources() {
+	apt-get update
+	apt-get install -y \
+		apt-transport-https \
+		gnupg \
+		ca-certificates \
+		--no-install-recommends
+		
+	# Enable sources, add PPAs and update sources: 
+	sudo sed 's/# deb/deb/' -i /etc/apt/sources.list
+}
 vboxRepo() {
 	echo "                                                           ###### Linking Virtualbox Repo #####"
 	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | apt-key add -
@@ -75,7 +91,6 @@ atomRepo() {
 	deb-src http://ppa.launchpad.net/webupd8team/atom/ubuntu xenial main 
 	EOF
 }
-
 firefoxRepo() {
 	echo "                                                           ###### Linking Firefox Repo #####"
 	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B34505EA326FEAEA07E3618DEF4186FE247510BE
@@ -84,7 +99,6 @@ firefoxRepo() {
 	deb-src http://ppa.launchpad.net/ubuntu-mozilla-daily/firefox-aurora/ubuntu xenial main 
 	EOF
 }
-
 chromeRepo() {
 	echo "                                                           ###### Linking Chrome Repo #####"
 	wget -q https://dl-ssl.google.com/linux/linux_signing_key.pub -O- | apt-key add -
@@ -98,58 +112,5 @@ syncthingRepo() {
 	cat <<-EOF > /etc/apt/sources.list.d/syncthing.list
 	deb http://apt.syncthing.net/ syncthing release
 	EOF
-}
-
-setSources() {
-	apt-get update
-	apt-get install -y \
-		apt-transport-https \
-		gnupg \
-		ca-certificates \
-		--no-install-recommends
-	mv /etc/apt/sources.list /etc/apt/sources.list.original
-	cat <<-EOF > /etc/apt/sources.list
-	# See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to newer versions of the distribution.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
-
-	## Major bug fix updates produced after the final release of the distribution.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
-
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team.
-	## Also, please note that software in universe WILL NOT receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial universe
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial universe
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
-
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team, and may not be under a free licence.
-	## Please satisfy yourself as to your rights to use the software. Also, please note that software in multiverse WILL NOT
-	## receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
-
-	## N.B. software from this repository may not have been tested as extensively as that contained in the main release,
-	## although it includes newer versions of some applications which may provide useful features.
-	## Also, please note that software in backports WILL NOT receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
-
-	deb http://security.ubuntu.com/ubuntu xenial-security main restricted
-	deb-src http://security.ubuntu.com/ubuntu xenial-security main restricted
-	deb http://security.ubuntu.com/ubuntu xenial-security universe
-	deb-src http://security.ubuntu.com/ubuntu xenial-security universe
-	deb http://security.ubuntu.com/ubuntu xenial-security multiverse
-	deb-src http://security.ubuntu.com/ubuntu xenial-security multiverse
-	EOF
-}
-
-setTranslations() {
-	# turn off translations, speed up apt-get update
-	mkdir -p /etc/apt/apt.conf.d
-	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
 }
 

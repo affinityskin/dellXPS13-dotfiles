@@ -51,6 +51,7 @@ upgradeSystem() {
 setRepos() {
 	checkSudo
 	source payload/zbcncRepo
+	setTranslations
 	setSources
 	vboxRepo
 	ansibleRepo
@@ -61,7 +62,6 @@ setRepos() {
 	atomRepo
 	firefoxRepo
 	chromeRepo
-	setTranslations
 }
 configHardware() {
 	checkSudo
@@ -119,75 +119,22 @@ installApps() {
 	setVars
 	source payload/zbcncApps
 	source payload/zbcncScripts
-	source payload/zbcncTerminals
-	source payload/zbcncDocker
 	deployBaseApps
 	deployPython
-	deployWindowManager
 	deployTermite
 	deployDocker
 	deployScripts
 	deployVBox
 	deployVagrant
+}
+installTexteditors() {
+	deploySublime
+	deployAtom
+	deployGolang
+	deployMinify
+	deployYeoman
 
 }
-
-deployGolang() {
-	checkSudo
-	setVars
-	source payload/zbcncGolang
-}
-
-deployDotfiles() {
-	local dot="$1"
-	if [ "$dot" == user ]; then
-		setUsername
-		linkUserdots
-	elif [ "$dot" == root ]; then
-		checkSudo
-		linkRootdots
-	else
-		echo "Please try Again"
-	fi
-}
-
-
-
-deploySublime() {
-	cd "${MAKEDIR}"
-	wget https://download.sublimetext.com/sublime-text_build-3114_amd64.deb
-	sudo dpkg -i "${MAKEDIR}"/sublime-text_build-3114_amd64.deb
-	sleep 1
-	sudo mv /usr/bin/subl /usr/bin/sublime
-}
-deployAtom() {
-	cd "${MAKEDIR}"
-	curl -L https://atom.io/download/deb -o atom.deb
-	dpkg -i atom.deb
-}
-
-deployMinify() {
-	# Sublime Minify Dependencies
-	npm install -g \
-		clean-css \
-		uglifycss \
-		js-beautify \
-		html-minifier \
-		uglify-js \
-		minjson \
-		svgo
-}
-
-deployYeoman(){
-	npm install -g \
-		gulp-cli \
-		bower \
-		yo \
-		browserify \
-		assemble \
-		browser-sync
-}
-
 showLoading() {
   mypid=$!
   loadingText=$1
@@ -229,15 +176,15 @@ checkSudo() {
 usage() {
 	echo -e "zeroBytes Comand & Controler\n\tAn installation helper for a debian laptop setup\n"
 	echo "Usage:"
-	echo "  sources                     - setup sources & install base pkgs"
-	echo "  i3wm                        - install i3 window manager"
+	echo "  repos                       - setup sources & install base pkgs"
 	echo "  dotfiles {user,root}        - link dotfiles"
-	echo "  docker                      - install docker"
-	echo "  python {icdiff,ansible}     - install icdiff or Ansible"
-	echo "  golang                      - install golang and packages"
+	echo "  deps {all,repos,hardware}   - install icdiff or Ansible"
+	echo "  deploy {fonts, xorg, i3}    - install docker"
+	echo "  install {apps, }                      - install golang and packages"
 	echo "  scripts                     - install scripts"
 	echo "  syncthing                   - install syncthing"
 	echo "  vagrant                     - install vagrant and virtualbox"
+	echo "  fSudo                       - because fuck typing sudo"
 }
 main() {
 	local cmd=$1
