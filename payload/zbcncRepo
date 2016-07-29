@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+
+setRepos() {
+	vboxRepo
+	ansibleRepo
+	neovimRepo
+	neofetchRepo
+	dockerRepo
+}
+vboxRepo() {
+	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | apt-key add -
+	# add virtualbox
+	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
+	deb http://download.virtualbox.org/virtualbox/debian xenial contrib
+	EOF
+}
+neofetchRepo() {
+	# add neofetch
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
+	cat <<-EOF > /etc/apt/sources.list.d/neofetch.list
+	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
+	EOF
+}
+ansibleRepo() {
+	# add ansible
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
+	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
+	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
+	EOF
+}
+neovimRepo() {
+	# add neovim
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
+	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
+	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
+	EOF
+}
+gitRepo() {
+	# add git-core
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
+	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
+	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
+	EOF
+}
+dockerRepo() {
+	# add docker apt repo
+	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+	cat <<-EOF > /etc/apt/sources.list.d/docker.list
+	deb http://apt.dockerproject.org/repo ubuntu-xenial main
+	EOF
+}
