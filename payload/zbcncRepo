@@ -75,7 +75,7 @@ firefoxRepo() {
 }
 
 chromeRepo() {
-	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 	cat <<-EOF > /etc/apt/sources.list.d/chrome-canary.list
 	deb http://dl.google.com/linux/chrome/deb/ stable main
 	EOF
