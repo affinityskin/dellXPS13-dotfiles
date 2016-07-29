@@ -13,6 +13,7 @@
 ########################################################################
 
 vboxRepo() {
+	echo "Linking Virtualbox Repo"
 	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | apt-key add -
 	# add virtualbox
 	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
@@ -20,7 +21,7 @@ vboxRepo() {
 	EOF
 }
 neofetchRepo() {
-	# add neofetch
+	echo "Linking Neofetch Repo"
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
 	cat <<-EOF > /etc/apt/sources.list.d/neofetch.list
 	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
@@ -28,7 +29,7 @@ neofetchRepo() {
 	EOF
 }
 ansibleRepo() {
-	# add ansible
+	echo "Linking Ansible Repo"
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
 	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
 	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
@@ -36,7 +37,7 @@ ansibleRepo() {
 	EOF
 }
 neovimRepo() {
-	# add neovim
+	echo "Linking Neovim Repo"
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
 	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
 	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
@@ -44,7 +45,7 @@ neovimRepo() {
 	EOF
 }
 gitRepo() {
-	# add git-core
+	echo "Linking Git Repo"
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
 	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
 	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
@@ -52,13 +53,14 @@ gitRepo() {
 	EOF
 }
 dockerRepo() {
-	# add docker apt repo
+	echo "Linking Docker Repo"
 	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 	cat <<-EOF > /etc/apt/sources.list.d/docker.list
 	deb http://apt.dockerproject.org/repo ubuntu-xenial main
 	EOF
 }
 atomRepo() {
+	echo "Linking Atom Repo"
 	apt-key adv--keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 7B2C3B0889BF5709A105D03AC2518248EEA14886
 	cat <<-EOF > /etc/apt/sources.list.d/atom.list
 	deb http://ppa.launchpad.net/webupd8team/atom/ubuntu xenial main 
@@ -67,6 +69,7 @@ atomRepo() {
 }
 
 firefoxRepo() {
+	echo "Linking Firefox Repo"
 	apt-key adv--keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B34505EA326FEAEA07E3618DEF4186FE247510BE
 	cat <<-EOF > /etc/apt/sources.list.d/firefox-aurora.list
 	deb http://ppa.launchpad.net/ubuntu-mozilla-daily/firefox-aurora/ubuntu xenial main 
@@ -75,6 +78,7 @@ firefoxRepo() {
 }
 
 chromeRepo() {
+	echo "Linking Chrome Repo"
 	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 	cat <<-EOF > /etc/apt/sources.list.d/chrome-canary.list
 	deb http://dl.google.com/linux/chrome/deb/ stable main
