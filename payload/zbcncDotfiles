@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+
+linkUserdots() {
+	setVars
+	cp "${HOME}"/.bashrc "${HOME}"/.bashrc.original
+	cd "${HOME}"
+	# link dotfolders
+	ln -snf "$DOTFILES"/atom "$HOME"/.atom
+	ln -snf "$DOTFILES"/bash.d "$HOME"/.bash.d
+	ln -snf "$DOTFILES"/config "$HOME"/.config
+	ln -snf "$DOTFILES"/consul "$HOME"/.consul
+	ln -snf "$DOTFILES"/fonts "$HOME"/.fonts
+	ln -snf "$DOTFILES"/gnupg "$HOME"/.gnupg
+	ln -snf "$DOTFILES"/gordon "$HOME"/.gordon
+	ln -snf "$DOTFILES"/i3 "$HOME"/.i3
+	ln -snf "$DOTFILES"/irssi "$HOME"/.irssi
+	ln -snf "$DOTFILES"/nginx "$HOME"/.nginx
+	ln -snf "$DOTFILES"/cripts "$HOME"/.scripts
+	ln -snf "$DOTFILES"/vim "$HOME"/.vim
+	ln -snf "$DOTFILES"/weechat "$HOME"/.weechat
+	# link dotfiles
+	ln -snf "$DOTFILES"/bash_profile "$HOME"/.bash_profile
+	ln -snf "$DOTFILES"/bashrc "$HOME"/.bashrc
+	ln -snf "$DOTFILES"/compton.conf "$HOME"/.compton
+	ln -snf "$DOTFILES"/dockerfunc "$HOME"/.dockerfunc	
+	ln -snf "$DOTFILES"/exports "$HOME"/.exports
+	ln -snf "$DOTFILES"/functions "$HOME"/.functions
+	ln -snf "$DOTFILES"/gitconfig "$HOME"/.gitconfig
+	ln -snf "$DOTFILES"/gitignore "$HOME"/.gitignore
+	ln -snf "$DOTFILES"/gtkrc "$HOME"/.gtkrc
+	ln -snf "$DOTFILES"/gtkrc-2.0 "$HOME"/.gtkrc-2.0
+	ln -snf "$DOTFILES"/inputrc "$HOME"/.inputrc
+	ln -snf "$DOTFILES"/mpd.conf "$HOME"/.mpd.conf
+	ln -snf "$DOTFILES"/path "$HOME"/.path
+	ln -snf "$DOTFILES"/rainbow_config.json "$HOME"/.rainbow_config.json
+	ln -snf "$DOTFILES"/tmux "$HOME"/.tmux
+	ln -snf "$DOTFILES"/travis.yml "$HOME"/.travis.yml
+	ln -snf "$DOTFILES"/vimrc "$HOME"/.vimrc
+	ln -snf "$DOTFILES"/xinitrc "$HOME"/.xinitrc
+	ln -snf "$DOTFILES"/Xresources "$HOME"/.Xresources
+	#mv "${HOME}"/.config "${HOME}"/.config-bu
+	source ~/.bashrc
+}
+linkRootdots() {
+mv "${ROOTDIR}"/.bashrc "${ROOTDIR}"/.bashrc.original
+ln -snf "${ROOTDOTS}"/.bashrc "${ROOTDIR}"/.bashrc
+# folders
+ln -snf "${ROOTDOTS}"/.bash.d "${ROOTDIR}"/.bash.d
+ln -snf "${ROOTDOTS}"/scripts "${ROOTDIR}"/scripts
+ln -snf "${ROOTDOTS}"/.xinitrc "${ROOTDIR}"/.xinitrc
+ln -snf "${ROOTDOTS}"/.Xresources "${ROOTDIR}"/.Xresources
+# set permissions
+chown -R root:root "${ROOTDIR}"/.bashrc
+chown -R root:root "${ROOTDIR}"/.bashrc-bu
+chown -R root:root "${ROOTDIR}"/.bash.d
+chown -R root:root "${ROOTDIR}"/scripts
+chown -R root:root "${ROOTDIR}"/.xinitrc
+chown -R root:root "${ROOTDIR}"/.Xresources
+}

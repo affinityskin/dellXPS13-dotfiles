@@ -28,6 +28,14 @@ neofetchRepo() {
 	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
 	EOF
 }
+numixRepo() {
+	echo "                                                           ###### Linking Numix Repo #####"
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 43E076121739DEE5FB96BBED52B709720F164EEB
+	cat <<-EOF > /etc/apt/sources.list.d/numix.list
+	deb http://ppa.launchpad.net/numix/ppa/ubuntu xenial main
+	deb-src http://ppa.launchpad.net/numix/ppa/ubuntu xenial main
+	EOF
+}
 ansibleRepo() {
 	echo "                                                           ###### Linking Ansible Repo #####"
 	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
@@ -79,9 +87,16 @@ firefoxRepo() {
 
 chromeRepo() {
 	echo "                                                           ###### Linking Chrome Repo #####"
-	wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+	wget -q https://dl-ssl.google.com/linux/linux_signing_key.pub -O- | apt-key add -
 	cat <<-EOF > /etc/apt/sources.list.d/chrome-canary.list
 	deb http://dl.google.com/linux/chrome/deb/ stable main
+	EOF
+}
+syncthingRepo() {
+	echo "                                                           ###### Linking Syncthing Repo #####"
+	wget -q https://syncthing.net/release-key.txt -O- | sudo apt-key add -
+	cat <<-EOF > /etc/apt/sources.list.d/syncthing.list
+	deb http://apt.syncthing.net/ syncthing release
 	EOF
 }
 

@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+
+
+# xorg install command
+deployXorg() {
+	echo "                                       ##### Installing Xorg #####"
+	apt-get update
+	apt-get install -y \
+		xorg \
+		xserver-xorg \
+		x11-xserver-utils \
+		x11-xfs-utils \
+		x11-xkb-utils \
+		x11-session-utils \
+		x11proto-core-dev \
+		mesa-common-dev \
+		glew-utils \
+		--no-install-recommends
+
+}
+deployXfixes() {
+	setVars
+	echo "                                       ##### Compiling Unclutter-xfixes #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/unclutter-xfixes.git
+	sleep 1
+	cd "${MAKEDIR}"/unclutter-xfixes
+	make
+	make install
+}
+
+deployXedgewarp() {
+	setVars
+	echo "                                       ##### Compiling xEdgewarp #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/xedgewarp.git
+	sleep 1
+	cd "${MAKEDIR}"/xedgewarp
+	make
+	make install
+}
+
+deployXtitle() {
+	setVars
+	echo "                                       ##### Compiling xTitle #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/baskerville/xtitle.git
+	sleep 1
+	cd "${MAKEDIR}"/xtitle
+	make
+	make install
+}
+
+deployXRMutil() {
+	setVars
+	echo "                                       ##### Compiling XCB Util-XRM Module #####"
+	cd "${MAKEDIR}"
+	git clone --recursive https://github.com/Airblader/xcb-util-xrm.git
+	cd "${MAKEDIR}"/xcb-util-xrm
+	./autogen.sh
+	make
+	make install
+}

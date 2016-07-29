@@ -1,0 +1,131 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+deployI3deps() {
+	setVars
+	echo "                                       ##### Adding i3 Keyring #####"
+	apt-get --allow-unauthenticated install -y sur5r-keyring
+	apt-get update
+	sleep 1
+
+	echo "                                       ##### Installing i3 Gaps Deps #####"
+	apt-get build-dep -y \
+		i3 \
+		i3blocks \
+		i3lock
+	apt-get install -y \
+		libanyevent-i3-perl \
+		libjson-xs-perl
+}
+deployCompton() {
+	setVars
+	echo "                                       ##### Installing Compton #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/chjj/compton.git
+	cd "${MAKEDIR}"/compton
+	make
+	make docs
+	make install clean
+}
+deployI3wm() {
+	setVars
+	echo "                                       ##### Compiling i3 Gaps #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/i3.git
+	cd i3
+	git checkout gaps-next
+	sleep 1
+	git pull
+	sleep 1
+	make
+	sleep 1
+	make install
+	deployI3blocks & showLoading "$@"
+	deployI3status & showLoading "$@"
+	deployI3lock & showLoading "$@"
+	deployRofi
+}
+deployI3blocks() {
+	setVars
+	echo "                                       ##### Compiling i3 Block Gaps"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/i3blocks-gaps.git
+	sleep 1
+	cd "${MAKEDIR}"/i3blocks-gaps
+	make clean debug
+	sleep 1
+	make
+	make install
+}
+deployI3status() {
+	setVars
+	echo "                                       ##### Compiling i3status #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/i3status.git
+	sleep 1
+	cd "${MAKEDIR}"/i3status
+	make
+	make install
+}
+
+deployI3lock() {
+	setVars
+	echo "                                       ##### Compiling i3lock #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/Airblader/i3lock.git
+	sleep 1
+	cd "${MAKEDIR}"/i3lock
+	make
+	make install
+}
+deployRofi() {
+	setVars
+	echo "                                       ##### Installing Rofi #####"
+	cd "${MAKEDIR}"
+	git clone https://github.com/DaveDavenport/rofi.git
+	cd "${MAKEDIR}"/rofi
+	sleep 2
+	git submodule update
+	sleep 2
+	git submodule init
+	sleep 2
+	git submodule update
+	sleep 2
+	git submodule init
+	sleep 2
+	autoreconf -i
+	sleep 1
+	mkdir build
+	cd build
+	../configure
+	make
+	make install clean
+}
+deployMaim() {
+	echo "                                       ##### Installing Maim #####"
+cd "${MAKEDIR}"
+git clone https://github.com/naelstrof/maim.git
+cd "${MAKEDIR}"/maim
+cmake ./
+make
+sudo make install
+}
+deploySlop() {
+	echo "                                       ##### Installing Slop #####"
+cd "${MAKEDIR}"
+git clone https://github.com/naelstrof/slop.git
+cd "${MAKEDIR}"/slop
+cmake -DCMAKE_OPENGL_SUPPORT=true ./
+make
+sudo make install
+}

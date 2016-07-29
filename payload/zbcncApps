@@ -1,0 +1,201 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+deployBaseApps() {
+	apt-get install -y \
+		curl \
+		flashplugin-installer \
+		gnupg \
+		htop \
+		imagemagick \
+		jq \
+		mpc \
+		neofetch \
+		openvpn \
+		rar \
+		remmina \
+		s3cmd \
+		scdaemon \
+		scrot \
+		solaar \
+		thefuck \
+		unrar \
+		unzip \
+		w3m \
+		w3m-img \
+		weechat \
+		zip \
+		asciidoc \
+		aspell-en \
+		--no-install-recommends
+
+	# install with recommends
+	apt-get install -y \ 
+		tlp \
+		tlp-rdw \
+		firefox-aurora
+		chromium-browser
+}
+deployPython() {
+	echo "Installing Python Pakcages"
+	apt-get install -y \
+		python-pip \
+		python-urllib3 \
+		python-netifaces \
+		python-yaml \
+		python-suds \
+		libjpeg-dev \
+		zlib1g-dev \
+		libtiff5-dev \
+		libjpeg8-dev \
+		libssl-dev \
+		libffi-dev \
+		liblcms2-dev \
+		libwebp-dev \
+		tcl8.6-dev \
+		tk8.6-dev \
+		python-tk \
+		libfreetype6-dev \
+		python2.7-dev \
+		python-setuptools \
+		python-dev \
+		python3-pip \
+		python3-setuptools \
+		libiw-dev \
+		--no-install-recommends
+	easy_install pip
+	pip install --upgrade pip
+	pip3 install basiciw
+	pip3 install pillow
+}
+deployDocker() {
+	setUsername
+	apt-get update
+	apt-get install -y linux-image-extra-"$(uname -r)"
+	apt-cache policy docker-engine
+	apt-get update
+	apt-get install -y docker-engine
+	usermod -aG docker "$USERNAME"
+	systemctl start docker
+	systemctl enable docker
+
+	# update grub with docker configs and power-saving items
+	sed -i.bak 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1 i915.enable_psr=0 pcie_asm=force i915.i915_enable_fbc=1 i915.i915_enable_rc6=7 i915.lvds_downclock=1 apparmor=1 security=apparmor"/g' /etc/default/grub
+	update-grub
+	echo "Docker has been installed. If you want memory management & swap"
+	echo "please reboot your machine"
+}
+deployVBox() {
+	apt-get update
+	apt-get install -y \
+		virtualbox-5.1
+	--no-install-recommends
+}
+deployVagrant() {
+	VAGRANT_VERSION=1.8.4
+
+	# if we are passing the version
+	if [[ ! -z "$1" ]]; then
+		export VAGRANT_VERSION=$1
+	fi
+
+	# check if we need to install virtualbox
+	PKG_OK=$(dpkg-query -W --showformat="${Status}\n" virtualbox | grep "install ok installed")
+	echo Checking for virtualbox: "$PKG_OK"
+	if [ "" == "$PKG_OK" ]; then
+		echo "No virtualbox. Installing virtualbox."
+		deployVBox
+	fi
+
+	tmpdir=$(mktemp -d)
+	(
+	cd "$tmpdir"
+	curl -sSL -o vagrant.deb https://releases.hashicorp.com/vagrant/"${VAGRANT_VERSION}"/vagrant_"${VAGRANT_VERSION}"_x86_64.deb
+	dpkg -i vagrant.deb
+	)
+
+	rm -rf "$tmpdir"
+
+	# install plugins
+	vagrant plugin install vagrant-vbguest
+	vagrant plugin install vagrant-bindfs
+	vagrant plugin install vagrant-hostmanager
+}
+deploySyncthing() {
+	setVars
+	apt-cache policy syncthing
+	apt-get install -y syncthing
+	cat <<-EOF > /etc/systemd/system/syncthing@.service
+	[Unit]
+	Description=Syncthing - Open Source Continuous File Synchronization for %I
+	Documentation=http://docs.syncthing.net/
+	After=network.target
+
+	[Service]
+	User=%i
+	ExecStart=/usr/local/bin/syncthing -no-browser -no-restart -logflags=0
+	Restart=on-failure
+	SuccessExitStatus=2 3 4
+	RestartForceExitStatus=3 4
+
+	[Install]
+	WantedBy=multi-user.target
+	EOF
+	systemctl daemon-reload
+	systemctl enable "syncthing@${USERNAME}"
+
+	# download syncthing binary
+	#if [[ ! -f /usr/local/bin/syncthing ]]; then
+	#	curl -sSL https://jesss.s3.amazonaws.com/binaries/syncthing > /usr/local/bin/syncthing
+	#	chmod +x /usr/local/bin/syncthing
+	#fi
+	syncthing -upgrade
+}
+deployTermite() {
+	checkSudo
+	setVars
+	cd "${MAKEDIR}"; git clone https://github.com/affinityskin/vte-ng.git
+	apt-get install -y \
+		libgtk-3-dev \
+		gtk-doc-tools \
+		gnutls-bin \
+		valac \
+		libglib3.0-cil-dev \
+		libgnutls28-dev \
+		libgirepository1.0-dev \
+		libxml2-utils gperf \
+		libglib-object-introspection-perl
+	cd "${MAKEDIR}"/vte-ng/
+	"${MAKEDIR}"/vte-ng/./autogen.sh
+	make
+	make install
+	cd "${MAKEDIR}"
+	git clone --recursive https://github.com/affinityskin/termite.git
+	sleep 1
+	cd "${MAKEDIR}"/termite
+	git checkout -b c6d1425189bccfc57393e11458cb3efcf566ac86
+	sleep 1
+	make
+	make install
+	cp /usr/local/lib/libvte-2.91.a /usr/local/lib/libvte-2.91.la
+	cp /usr/local/lib/libvte-2.91.so /usr/local/lib/libvte-2.91.so.0
+	cp /usr/local/lib/libvte-2.91.so.0.4000.2 /usr/lib
+	mkdir -p /lib/terminfo/x
+	ln -s /usr/local/share/terminfo/x/xterm-termite /lib/terminfo/x/xterm-termite
+	
+	cat <<-EOF > "$HOME"/termite/desktop.termite
+	#!/bin/sh
+	`grep '^Exec' $1 | tail -1 | sed 's/^Exec=//' | sed 's/%.//'` &
+	EOF
+	echo "'Run ~/./deskopen termite.desktop' after next reboot"
+}

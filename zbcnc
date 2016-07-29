@@ -13,432 +13,14 @@
 ########################################################################
 
 set -e
-
 export DEBIAN_FRONTEND=noninteractive
-
-setRepos() {
-	source payload/zbcncRepo
-	setSources
-	vboxRepo
-	ansibleRepo
-	neovimRepo
-	neofetchRepo
-	dockerRepo
-	atomRepo
-	firefoxRepo
-	chromeRepo
-	setTranslations
-}
-# installs base packages
-deployAppUtils() {
-	apt-get update
-	apt-get upgrade -y
-	apt-get dist-upgrade -y
-
-	apt-get install -y \
-		bcmwl-kernel-source \
-		intel-microcode \
-		build-essential \
-		dkms \
-		bash-completion \
-		automake \
-		autogen \
-		autoconf \
-		pkg-config \
-		cmake \
-		gettext \
-		bc \
-		gcc \
-		g++ \
-		automake \
-		bash-completion \
-		bridge-utils \
-		cgroupfs-mount \
-		coreutils \
-		curl \
-		dnsutils \
-		file \
-		findutils \
-		gnupg \
-		indent \
-		jq \
-		libapparmor-dev \
-		libc6-dev \
-		libltdl-dev \
-		libseccomp-dev \
-		lsof \
-		net-tools \
-		network-manager \
-		openvpn \
-		rxvt-unicode-256color \
-		s3cmd \
-		scdaemon \
-		silversearcher-ag \
-		strace \
-		tree \
-		xz-utils \
-		zip \
-		unzip \
-		rar \
-		unrar \
-		asciidoc \
-		flashplugin-installer \
-		cabextract \
-		alsa-base \
-		alsa-utils \
-		lm-sensors \
-		feh \
-		solaar \
-		acpi \
-		xdotool \
-		pulseaudio \
-		pulseaudio-utils \
-		neofetch \
-		pavucontrol \
-	 	network-manager \
-	 	network-manager-openvpn \
-	 	imagemagick \
-		remmina \
-	 	thunar \
-	 	thunar-archive-plugin \
-	 	file-roller \
-	 	tumbler \
-	 	eog \
-		autoconf \
-		automake \
-		pkg-config \
-	 	tk \
-	 	aspell-en \
-	 	evince \
-		w3m \
- 		w3m-img \
- 		htop \
- 		bluez \
-	 	blueman \
-	 	weechat \
-		scrot \
-		mpc \
-		gvfs-libs \
-		xclip \
-		thefuck \
-		firefox \
-		chromium-browser \
-		--no-install-recommends
-
-	# install tlp with recommends
-	apt-get install -y tlp tlp-rdw
-
-	# clean up after install
-	apt-get autoremove
-	apt-get autoclean
-	apt-get clean
-}
-deployXdeps() {
-	apt-get install -y \
-		libx11-dev \
-		libxcomposite-dev \
-		libxdamage-dev \
-		libxfixes-dev \
-		libxext-dev \
-		libxft2 \
-		libtool \
-		libpango1.0-dev \
-		libpangocairo-1.0-0 \
-		libcairo2-dev \
-		libpam0g-dev \
-		libcairo2-dev \
-		libx11-dev \
-		libx11-xcb-dev \
-		libglib2.0-dev \
-		libx11-dev \
-		libstartup-notification0-dev \
-		libxkbcommon-dev \
-		libxkbcommon-x11-dev \
-		libxcb-xinerama0-dev \
-		libxcb-xkb-dev \
-		libxcb1-dev \
-		libxcb-icccm4-dev \
-		libxcb-ewmh-dev \
-		libxcb-util-dev \
-		libxcb-util1 \
-		libxcb-util-dev \
-		xutils-dev \
-		libxcb-util0-dev \
-		libxcb1-dev \
-		libxcb-keysyms1-dev \
-		libconfuse-dev \
-		libyajl-dev \
-		libasound2-dev \
-		libiw-dev \
-		libcap2-bin \
-		libpulse-dev \
-		libpango1.0-dev \
-		libxcb-util0-dev \
-		libxcb-icccm4-dev \
-		libyajl-dev \
-		libstartup-notification0-dev \
-		libxcb-randr0-dev \
-		libev-dev \
-		libxcb-cursor-dev \
-		libxcb-xinerama0-dev \
-		libxcb-xkb-dev \
-		libxkbcommon-dev \
-		libxkbcommon-x11-dev \
-		libx11-dev \
-		libxfixes-dev \
-		libxi-dev \
-		libxrandr-dev \
-		libxcb1-dev \
-		libxcb-util-dev \
-		libxcb-util0-dev \
-		libimlib2-dev \
-		libxrandr-dev \
-		libxfixes-dev \
-		libxext-dev \
-		libgl1-mesa-dev \
-		libxrender-dev \
-		libglew-dev \
-		libglm-dev \
-		libx11-xcb-dev \
-		libxcb-ewmh-dev \
-		libxcb-dpms0-dev \
-		libxrender-dev \
-		libxrandr-dev \
-		libxinerama-dev \
-		libxcb-util0-dev \
-		x11-utils \
-		x11proto-core-dev \
-		x11proto-composite-dev \
-		libpcre3-dev \
-		libdbus-1-dev \
-		libpcre3-dev \
-		libpcre2-dev \
-		libconfig-dev \
-		libdrm-dev \
-		libgl1-mesa-dev \
-		libgl1-mesa-glx \
-		libxslt1-dev \
-		libxml2-utils \
-		xsltproc \
-		xmlto \
-		docbook-xml \
-		--no-install-recommends
-}
-deployPydeps() {
-	echo "Installing Python Pakcages"
-	sudo apt-get install -y \
-		python-pip \
-		python-urllib3 \
-		python-netifaces \
-		python-yaml \
-		python-suds \
-		libjpeg-dev \
-		zlib1g-dev \
-		libtiff5-dev \
-		libjpeg8-dev \
-		libssl-dev \
-		libffi-dev \
-		liblcms2-dev \
-		libwebp-dev \
-		tcl8.6-dev \
-		tk8.6-dev \
-		python-tk \
-		libfreetype6-dev \
-		python2.7-dev \
-		python-setuptools \
-		python-dev \
-		python3-pip \
-		python3-setuptools \
-		libiw-dev
-	sudo easy_install pip
-	pip install --upgrade pip
-	pip3 install basiciw
-	pip3 install pillow
-}
-# install stuff for i3 window manager
-get_dotfiles() {
-	# create subshell
-	(
-	cd "/home/$USERNAME"
-
-	# install dotfiles from repo
-	git clone git@github.com:affinityskin/zbcnc-dotfiles.git "/home/$USERNAME/.dotfiles"
-	cd /home/"$USERNAME"/.dotfiles
-	# installs all the things
-	make
-
-	# enable dbus for the user session
-	sudo systemctl --user enable dbus.socket
-
-	sudo systemctl enable i3lock
-	sudo systemctl enable suspend-sedation.service
-
-	cd "/home/$USERNAME"
-
-	# install .vim files
-	git clone --recursive git@github.com:jfrazelle/.vim.git "/home/$USERNAME/.vim"
-	ln -snf "/home/$USERNAME/.vim/vimrc" "/home/$USERNAME/.vimrc"
-	sudo ln -snf "/home/$USERNAME/.vim" /root/.vim
-	sudo ln -snf "/home/$USERNAME/.vimrc" /root/.vimrc
-
-	# alias vim dotfiles to neovim
-	mkdir -p "${XDG_CONFIG_HOME:=$HOME/.config}"
-	ln -snf "/home/$USERNAME/.vim" "$XDG_CONFIG_HOME"/nvim
-	ln -snf "/home/$USERNAME/.vimrc" "$XDG_CONFIG_HOME"/nvim/init.vim
-	# do the same for root
-	sudo mkdir -p /root/.config
-	sudo ln -snf "/home/$USERNAME/.vim" /root/.config/nvim
-	sudo ln -snf "/home/$USERNAME/.vimrc" /root/.config/nvim/init.vim
-
-	# update alternatives to neovim
-	sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
-	sudo update-alternatives --config vi
-	sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
-	sudo update-alternatives --config vim
-	sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
-	sudo update-alternatives --config editor
-
-	mkdir -p /home/"$USERNAME"/Pictures
-	mkdir -p /home/"$USERNAME"/Torrents
-	)
-}
-deployWM() {
-	checkSudo
-	setUsername
-	setVars
-	deployXorg
-	deployI3wm
-	deployCompton & showLoading "$@"
-	deployRofi & showLoading "$@"
-	deployMaim & showLoading "$@"
-	deploySlop & showLoading "$@"
-	# update clickpad settings
-	mkdir -p /etc/X11/xorg.conf.d/
-	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/X11/xorg.conf.d/50-synaptics-clickpad.conf > /etc/X11/xorg.conf.d/50-synaptics-clickpad.conf
-
-	# add xorg conf
-	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/X11/xorg.conf > /etc/X11/xorg.conf
-
-	# get correct sound cards on boot
-	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/modprobe.d/intel.conf > /etc/modprobe.d/intel.conf
-
-	# pretty fonts
-	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/fonts/local.conf > /etc/fonts/local.conf
-
-	deployFonts
-	echo "Fonts file setup successfully now run:"
-	echo "	dpkg-reconfigure fontconfig-config"
-	echo "with settings: "
-	echo "	Autohinter, Automatic, No."
-	echo "Run: "
-	echo "	dpkg-reconfigure fontconfig"
-
-}
-deployFonts() {
-	sudo apt-get update
-	echo "Installing Powerline fonts & Font Awesome"
-	sudo apt-get install -y \
-		fontconfig \
-		fonts-powerline \
-		fonts-font-awesome
-	echo "Installing Numix Icon Theme"
-		sudo add-apt-repository ppa:numix/ppa -y
-		sudo apt-get update
-		sudo apt-get install -y numix-icon-theme
-	echo "Installing Oh-Snap Font"
-	cd "${MAKEDIR}"
-	wget http://sourceforge.net/projects/osnapfont/files/ohsnap-1.8.0.tar.gz
-	tar xzvf ohsnap-1.8.0.tar.gz
-	cd "${MAKEDIR}"/ohsnap-1.8.0
-	sudo mkdir /usr/share/fonts/ohsnap
-	sudo mkdir -p /usr/share/kbd/consolefonts
-	sudo cp ./*.pcf /usr/share/fonts/ohsnap
-	sudo cp ./*.psfu /usr/share/kbd/consolefonts
-	sudo fc-cache -fs
-	sudo mkfontscale /usr/share/fonts/ohsnap
-	sudo mkfontdir /usr/share/fonts/ohsnap
-	echo "Installing Hack Font"
-	cd "${MAKEDIR}"
-	git clone https://github.com/chrissimpkins/Hack.git
-	sudo mkdir /usr/share/fonts/hack
-	sudo cp "${MAKEDIR}"/Hack/build/ttf/* /usr/share/fonts/hack
-	sudo cp "${MAKEDIR}"/Hack/build/otf/* /usr/share/fonts/hack
-	echo "Installing Font-Awesome"
-	cd "${MAKEDIR}"
-	git clone https://github.com/FortAwesome/Font-Awesome.git
-	cd "${MAKEDIR}"/Font-Awesome/fonts
-	cp fontawesome-webfont.ttf /usr/share/fonts/opentype/font-awesome
-	cp FontAwesome.otf /usr/share/fonts/opentype
-	sudo mkdir /usr/share/fonts/truetype/font-awesome
-	sudo cp fontawesome-webfont.ttf /usr/share/fonts/truetype/font-awesome
-	sudo fc-cache -fs
-	sudo mkfontscale /usr/share/fonts/
-	sudo mkfontdir /usr/share/fonts/
-}
-# install custom scripts/binaries
-deployScripts() {
-	# install acsciinema
-	curl -sSL https://asciinema.org/install | sh
-
-	# install speedtest
-	curl -sSL https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest_cli.py > /usr/local/bin/speedtest
-	chmod +x /usr/local/bin/speedtest
-
-	# install icdiff
-	curl -sSL https://raw.githubusercontent.com/jeffkaufman/icdiff/master/icdiff > /usr/local/bin/icdiff
-	curl -sSL https://raw.githubusercontent.com/jeffkaufman/icdiff/master/git-icdiff > /usr/local/bin/git-icdiff
-	chmod +x /usr/local/bin/icdiff
-	chmod +x /usr/local/bin/git-icdiff
-
-	# install lolcat
-	curl -sSL https://raw.githubusercontent.com/tehmaze/lolcat/master/lolcat > /usr/local/bin/lolcat
-	chmod +x /usr/local/bin/lolcat
-
-	# install git completion
-	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
-
-	# download syncthing binary
-	if [[ ! -f /usr/local/bin/syncthing ]]; then
-		curl -sSL https://jesss.s3.amazonaws.com/binaries/syncthing > /usr/local/bin/syncthing
-		chmod +x /usr/local/bin/syncthing
-	fi
-
-	syncthing -upgrade
-
-	local scripts=( go-md2man have light )
-
-	for script in "${scripts[@]}"; do
-		curl -sSL "http://jesss.s3.amazonaws.com/binaries/$script" > /usr/local/bin/"$script"
-		chmod +x /usr/local/bin/"$script"
-	done
-}
-configHardware() {
-	#configDisplaylink
-	configBluetooth
-}
-configDisplaylink() {
-	setVars
-	cd "$MAKEDIR"
-	wget http://www.displaylink.com/downloads/file?id=123
-	mv file?id=123 displaylink.zip
-	unzip displaylink.zip
-	chmod +x displaylink-driver-1.0.335.run
-	./displaylink-driver-1.0.335 --noexec --keep
-}
-configBluetooth() {
-	setVars
-	cd "$MAKEDIR"
-	wget http://download.windowsupdate.com/d/msdownload/update/driver/drvs/2014/07/20662520_6c535fbfa9dca0d07ab069e8918896086e2af0a7.cab
-	cabextract 20662520_6c535fbfa9dca0d07ab069e8918896086e2af0a7.cab
-	hex2hcd BCM20702A1_001.002.014.1443.1572.hex
-#	mv BCM20702A1_001.002.014.1443.1572.hcd /lib/firmware/brcm/BCM20702A1-0a5c-216f.hcd
-#	ln -rs /lib/firmware/BCM20702A1-0a5c-216f.hcd /lib/firmware/BCM20702A0-0a5c-216f.hcd
-}
-
 
 # setup sudo for a user because fuck typing that shit all the time just have a decent password and lock your computer when you aren't using 
 # it if they have your password they can sudo anyways so its pointless i know what the fuck im doing.
 fSudo() {
+	checkSudo
+	setVars
+
 	# add user to sudoers
 	adduser "$USERNAME" sudo
 
@@ -448,275 +30,112 @@ fSudo() {
 
 	# add go path to secure path
 	{ \
-		echo -e 'Defaults	secure_path="/usr/local/go/bin:/home/jessie/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'; \
+		echo -e 'Defaults	secure_path="/usr/local/go/bin:/home/loki/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'; \
 		echo -e 'Defaults	env_keep += "ftp_proxy http_proxy https_proxy no_proxy GOPATH EDITOR"'; \
 		echo -e "${USERNAME} ALL=(ALL) NOPASSWD:ALL"; \
 		echo -e "${USERNAME} ALL=NOPASSWD: /sbin/ifconfig, /sbin/ifup, /sbin/ifdown, /sbin/ifquery"; \
 	} >> /etc/sudoers
 
-	# setup downloads folder as tmpfs that way things are removed on reboot i like things clean but you may not want this
+	# setup downloads folder as tmpfs that way things are removed on reboot
 	mkdir -p "/home/$USERNAME/Downloads"
 	echo -e "\n# tmpfs for downloads\ntmpfs\t/home/${USERNAME}/Downloads\ttmpfs\tnodev,nosuid,size=2G\t0\t0" >> /etc/fstab
 }
-# installs docker master and adds necessary items to boot params
-deployDocker() {
+
+updateRepos() {
+	apt-get update
+}
+upgradeSystem() {
+	apt-get upgrade -y
+	apt-get dist-upgrade -y
+}
+setRepos() {
+	checkSudo
+	source payload/zbcncRepo
+	setSources
+	vboxRepo
+	ansibleRepo
+	neovimRepo
+	neofetchRepo
+	numixRepo
+	dockerRepo
+	atomRepo
+	firefoxRepo
+	chromeRepo
+	setTranslations
+}
+configHardware() {
+	checkSudo
+	setVars
+	source payload/zbcncHardware
+	#configDisplaylink
+	configBluetooth
+	configSound
+	configClickpad
+}
+installDeps() {}
+	checkSudo
+	setVars
+	source payload/zbcncDeps
+	updateRepos
+	upgradeSystem
+	deployUtils
+	deployXorgDeps
+	cleanAptInstall
+}
+installFonts() {
+	checkSudo
+	source payload/zbcncFonts
+	deployFonts
+	configFonts
+	echo "Fonts file setup successfully now run:"
+	echo "	dpkg-reconfigure fontconfig-config"
+	echo "with settings: "
+	echo "	Autohinter, Automatic, No."
+	echo "Run: "
+	echo "	dpkg-reconfigure fontconfig"
+}
+InstallXorg() {
+	checkSudo
 	setUsername
-	apt-get update
-	apt-get install -y linux-image-extra-"$(uname -r)"
-	apt-cache policy docker-engine
-	apt-get update
-	apt-get install -y docker-engine
-	usermod -aG docker "$USERNAME"
-	systemctl start docker
-	systemctl enable docker
-
-	# update grub with docker configs and power-saving items
-	sed -i.bak 's/GRUB_CMDLINE_LINUX=""/GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1 i915.enable_psr=0 pcie_asm=force i915.i915_enable_fbc=1 i915.i915_enable_rc6=7 i915.lvds_downclock=1 apparmor=1 security=apparmor"/g' /etc/default/grub
-	update-grub
-	echo "Docker has been installed. If you want memory management & swap"
-	echo "please reboot your machine"
+	source payload/zbcncXorg
+	deployXorg
+	deployXfixes
+	deployXedgewarp
+	deployXtitle
+	deployXRMutil
 }
-
-# install syncthing
-deploySyncthing() {
-	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/systemd/system/syncthing@.service > /etc/systemd/system/syncthing@.service
-	systemctl daemon-reload
-	systemctl enable "syncthing@${USERNAME}"
-}
-
-deployVBox() {
-	apt-get update
-	apt-get install -y \
-		virtualbox-5.1
-	--no-install-recommends
-}
-
-deployVagrant() {
-	VAGRANT_VERSION=1.8.4
-
-	# if we are passing the version
-	if [[ ! -z "$1" ]]; then
-		export VAGRANT_VERSION=$1
-	fi
-
-	# check if we need to install virtualbox
-	PKG_OK=$(dpkg-query -W --showformat="${Status}\n" virtualbox | grep "install ok installed")
-	echo Checking for virtualbox: "$PKG_OK"
-	if [ "" == "$PKG_OK" ]; then
-		echo "No virtualbox. Installing virtualbox."
-		deployVBox
-	fi
-
-	tmpdir=$(mktemp -d)
-	(
-	cd "$tmpdir"
-	curl -sSL -o vagrant.deb https://releases.hashicorp.com/vagrant/"${VAGRANT_VERSION}"/vagrant_"${VAGRANT_VERSION}"_x86_64.deb
-	dpkg -i vagrant.deb
-	)
-
-	rm -rf "$tmpdir"
-
-	# install plugins
-	vagrant plugin install vagrant-vbguest
-	vagrant plugin install vagrant-bindfs
-	vagrant plugin install vagrant-hostmanager
-}
-# xorg install command
-deployXorg() {
-echo "Installing Xorg"
-	apt-get update
-	apt-get install -y \
-		xorg \
-		xserver-xorg \
-		x11-xserver-utils \
-		x11-xfs-utils \
-		x11-xkb-utils \
-		x11-session-utils \
-		x11proto-core-dev \
-		mesa-common-dev \
-		glew-utils \
-		--no-install-recommends
-
-	deployXfixes & showLoading
-	deployXedgewarp & showLoading
-	deployXtitle & showLoading
-	deployXRMutil & showLoading
-}
-deployXfixes() {
-	setVars
-	echo "Compiling Unclutter-xfixes"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/unclutter-xfixes.git
-	sleep 1
-	cd "${MAKEDIR}"/unclutter-xfixes
-	make
-	make install
-}
-
-deployXedgewarp() {
-	setVars
-	echo "Compiling xEdgewarp"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/xedgewarp.git
-	sleep 1
-	cd "${MAKEDIR}"/xedgewarp
-	make
-	make install
-}
-
-deployXtitle() {
-	setVars
-	echo "Compiling xTitle"
-	cd "${MAKEDIR}"
-	git clone https://github.com/baskerville/xtitle.git
-	sleep 1
-	cd "${MAKEDIR}"/xtitle
-	make
-	make install
-}
-
-deployXRMutil() {
-	setVars
-	echo "Compiling XCB Util-XRM Module"
-	cd "${MAKEDIR}"
-	git clone --recursive https://github.com/Airblader/xcb-util-xrm.git
-	cd "${MAKEDIR}"/xcb-util-xrm
-	./autogen.sh
-	make
-	make install
-}
-deployCompton() {
-	setVars
-	echo "Installing Compton"
-	cd "${MAKEDIR}"
-	git clone https://github.com/chjj/compton.git
-	cd "${MAKEDIR}"/compton
-	make
-	make docs
-	make install clean
-}
-
-deployI3deps() {
-	setVars
-	echo "Adding i3 Keyring"
-	apt-get --allow-unauthenticated install -y sur5r-keyring
-	apt-get update
-	sleep 1
-
-	echo "Installing i3 Gaps Deps"
-	apt-get build-dep -y \
-		i3 \
-		i3blocks \
-		i3lock
-	apt-get install -y \
-		libanyevent-i3-perl \
-		libjson-xs-perl
-}
-deployI3wm() {
-	setVars
+installI3wm() {
+	checkSudo
+	setUsername
+	sources payload/zbcncI3wm
+	deployI3wm
 	deployCompton
-	deployI3deps
-	echo "Compiling i3 Gaps"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/i3.git
-	cd i3
-	git checkout gaps
-	sleep 1
-	git pull
-	sleep 1
-	make
-	sleep 1
-	make install
-	deployI3blocks & showLoading "$@"
-	deployI3status & showLoading "$@"
-	deployI3lock & showLoading "$@"
 	deployRofi
+	deployMaim
+	deploySlop
 }
-deployI3blocks() {
+installApps() {
+	checkSudo
 	setVars
-	echo "Installing i3 Block Gaps"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/i3blocks-gaps.git
-	sleep 1
-	cd "${MAKEDIR}"/i3blocks-gaps
-	make clean debug
-	sleep 1
-	make
-	make install
-}
-deployI3status() {
-	setVars
-	echo "compiling i3status"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/i3status.git
-	sleep 1
-	cd "${MAKEDIR}"/i3status
-	make
-	make install
+	source payload/zbcncApps
+	source payload/zbcncScripts
+	source payload/zbcncTerminals
+	source payload/zbcncDocker
+	deployBaseApps
+	deployPython
+	deployWindowManager
+	deployTermite
+	deployDocker
+	deployScripts
+	deployVBox
+	deployVagrant
+
 }
 
-deployI3lock() {
-	setVars
-	echo "compiling i3lock"
-	cd "${MAKEDIR}"
-	git clone https://github.com/Airblader/i3lock.git
-	sleep 1
-	cd "${MAKEDIR}"/i3lock
-	make
-	make install
-}
-deployRofi() {
-	setVars
-	echo "Installing Rofi"
-	cd "${MAKEDIR}"
-	git clone https://github.com/DaveDavenport/rofi.git
-	cd "${MAKEDIR}"/rofi
-	sleep 2
-	git submodule update
-	sleep 2
-	git submodule init
-	sleep 2
-	git submodule update
-	sleep 2
-	git submodule init
-	sleep 2
-	autoreconf -i
-	sleep 1
-	mkdir build
-	cd build
-	../configure
-	make
-	make install clean
-}
-deployNVM() {
-	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.3/install.sh | bash
-}
-deployGOVM() {
-	curl -L git.io/govm | python - setup
-}
-# install/update golang from source
 deployGolang() {
+	checkSudo
+	setVars
 	source payload/zbcncGolang
-}
-
-deployMaim() {
-echo "Setting Maim"
-cd "${MAKEDIR}"
-git clone https://github.com/naelstrof/maim.git
-cd "${MAKEDIR}"/maim
-cmake ./
-make
-sudo make install
-}
-
-deploySlop() {
-echo "Setting Slop"
-cd "${MAKEDIR}"
-git clone https://github.com/naelstrof/slop.git
-cd "${MAKEDIR}"/slop
-cmake -DCMAKE_OPENGL_SUPPORT=true ./
-make
-sudo make install
 }
 
 deployDotfiles() {
@@ -732,75 +151,7 @@ deployDotfiles() {
 	fi
 }
 
-linkUserdots() {
-cd "${HOME}"
-cp "${HOME}"/.bashrc "${HOME}"/.bashrc.bu
-ln -snf "${DOTFILES}"/.bashrc
-ln -snf "${DOTFILES}"/.bash_profile
-ln -snf "${DOTFILES}"/.bash.d
-#mv "${HOME}"/.config "${HOME}"/.config-bu
-ln -snf "${DOTFILES}"/.config
-ln -snf "${DOTFILES}"/.i3
-ln -snf "${DOTFILES}"/.vim
-ln -snf "${DOTFILES}"/.weechat
-ln -snf "${DOTFILES}"/scripts "${HOME}"/.scripts
-ln -snf "${DOTFILES}"/.compton.conf
-ln -snf "${DOTFILES}"/.gitconfig
-ln -snf "${DOTFILES}"/.gitignore
-ln -snf "${DOTFILES}"/.gtkrc-2.0
-ln -snf "${DOTFILES}"/.vimrc
-ln -snf "${DOTFILES}"/.xinitrc
-ln -snf "${DOTFILES}"/.Xresources
 
-source ~/.bashrc
-}
-linkRootdots() {
-cd "${ROOTDIR}"
-# folders
-ln -snf "${ROOTDOTS}"/.bash.d
-ln -snf "${ROOTDOTS}"/scripts
-
-# config
-#mv "${ROOTDIR}"/.config "${ROOTDIR}"/.config-bu
-#ln -snf ${ROOTDOTS}/.config
-
-# bash
-mv "${ROOTDIR}"/.bashrc "${ROOTDIR}"/.bashrc-bu
-ln -snf "${ROOTDOTS}"/.bashrc
-#ln -snf "${ROOTDOTS}"/.bash_profile
-
-# Xorg
-ln -snf "${ROOTDOTS}"/.xinitrc
-ln -snf "${ROOTDOTS}"/.Xresources
-
-# set permissions
-chown -R root:root "${ROOTDIR}"/.bashrc
-chown -R root:root "${ROOTDIR}"/.bashrc-bu
-chown -R root:root "${ROOTDIR}"/.bash.d
-chown -R root:root "${ROOTDIR}"/scripts
-chown -R root:root "${ROOTDIR}"/.xinitrc
-chown -R root:root "${ROOTDIR}"/.Xresources
-}
-deployTermite() {
-	cd "${MAKEDIR}"
-	git clone https://github.com/affinityskin/vte-ng.git
-	sudo apt-get install -y g++ libgtk-3-dev gtk-doc-tools gnutls-bin valac libglib3.0-cil-dev libgnutls28-dev libgirepository1.0-dev libxml2-utils gperf libglib-object-introspection-perl
-	cd vte-ng && ./autogen.sh && make && sudo make install
-	cd "${MAKEDIR}"
-	git clone --recursive https://github.com/affinityskin/termite.git
-	sleep 1
-	cd "${MAKEDIR}"/termite
-	git checkout -b c6d1425189bccfc57393e11458cb3efcf566ac86
-	sleep 1
-	make && sudo make install
-	sudo cp /usr/local/lib/libvte-2.91.a /usr/local/lib/libvte-2.91.la
-	sudo cp /usr/local/lib/libvte-2.91.so /usr/local/lib/libvte-2.91.so.0
-	sudo cp /usr/local/lib/libvte-2.91.so.0.4000.2 /usr/lib
-	sudo mkdir -p /lib/terminfo/x
-	sudo ln -s /usr/local/share/terminfo/x/xterm-termite /lib/terminfo/x/xterm-termite
-	cp "${BUILDDIR}"/deskopen "${MAKEDIR}"/termite
-	cd "${MAKEDIR}"/termite && sudo ./deskopen termite.desktop
-}
 
 deploySublime() {
 	cd "${MAKEDIR}"

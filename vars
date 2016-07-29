@@ -7,16 +7,15 @@
 # Author:	loki
 
 # Build Directories
-BUILDDIR=${HOME}/.zbcnc
+
 MAKEDIR=/tmp
 ROOTDIR=/root
 
 # Dotfile Directories
-DOTFILES=$BUILDDIR/dots
-ROOTDOTS=$BUILDDIR/rootdot
+DOTFILES="$HOME"/.zbcnc/userdots
+ROOTDOTS="$HOME"/.zbcnc/rootdots
 
 # Export Environment Variables
-export BUILDDIR
 export MAKEDIR
 export ROOTDIR
 export DOTFILES

@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+deployASCIinema() {
+	curl -sSL https://asciinema.org/install | sh
+}
+
+deployEasyEngine() {
+	wget -qO /tmp/ee rt.cx/ee | bash /tmp/ee
+	source /etc/bash_completion.d/ee_auto.rc
+}
+deploySpeedtest() {
+	curl -sSL https://gist.github.com/affinityskin/4138f2d31c02ce856f3e904ef5847fcf#file-speedtest-cli-py > /usr/local/bin/speedtest
+	chmod +x /usr/local/bin/speedtest
+}
+deployIcdiff() {
+	curl -sSL https://raw.githubusercontent.com/jeffkaufman/icdiff/master/icdiff > /usr/local/bin/icdiff
+	curl -sSL https://raw.githubusercontent.com/jeffkaufman/icdiff/master/git-icdiff > /usr/local/bin/git-icdiff
+	chmod +x /usr/local/bin/icdiff
+	chmod +x /usr/local/bin/git-icdiff
+}
+deployLolcat() {
+	curl -sSL https://raw.githubusercontent.com/tehmaze/lolcat/master/lolcat > /usr/local/bin/lolcat
+	chmod +x /usr/local/bin/lolcat
+}
+deployGitCompletion() {
+	curl https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash -o ~/.git-completion.bash
+}
+deployNVM() {
+	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.3/install.sh | bash
+}
+deployGOVM() {
+	curl -L git.io/govm | python - setup
+}
+deployComposer() {
+	php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+	php -r "if (hash_file('SHA384', 'composer-setup.php') === 'e115a8dc7871f15d853148a7fbac7da27d6c0030b848d9b3dc09e2a0388afed865e6a3d6b3c0fad45c48e2b5fc1196ae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+	php composer-setup.php --filename=composer --install-dir=/usr/local/bin
+}

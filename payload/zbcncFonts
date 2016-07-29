@@ -1,0 +1,87 @@
+#!/bin/bash
+#
+#	zeroBytes Command & Controller
+#
+#	Author:			zeroBytes
+#
+#	Distribution:	Ubuntu Xenial 16.04.1
+#
+#	Hardware:		Dell XPS 13 (9343)
+#
+#	Location:		/usr/local/bin/zbcnc
+#
+########################################################################
+deployFonts() {
+	apt-get update
+	echo "Installing Powerline fonts & Font Awesome"
+	apt-get install -y \
+		fontconfig \
+		fonts-powerline \
+		fonts-font-awesome
+	echo "Installing Numix Icon Theme"
+		add-apt-repository ppa:numix/ppa -y
+		apt-get update
+		apt-get install -y numix-icon-theme
+	echo "Installing Oh-Snap Font"
+	cd "${MAKEDIR}"
+	wget http://sourceforge.net/projects/osnapfont/files/ohsnap-1.8.0.tar.gz
+	tar xzvf ohsnap-1.8.0.tar.gz
+	cd "${MAKEDIR}"/ohsnap-1.8.0
+	mkdir /usr/share/fonts/ohsnap
+	mkdir -p /usr/share/kbd/consolefonts
+	cp ./*.pcf /usr/share/fonts/ohsnap
+	cp ./*.psfu /usr/share/kbd/consolefonts
+	fc-cache -fs
+	mkfontscale /usr/share/fonts/ohsnap
+	mkfontdir /usr/share/fonts/ohsnap
+	echo "Installing Hack Font"
+	cd "${MAKEDIR}"
+	git clone https://github.com/chrissimpkins/Hack.git
+	mkdir /usr/share/fonts/hack
+	cp "${MAKEDIR}"/Hack/build/ttf/* /usr/share/fonts/hack
+	cp "${MAKEDIR}"/Hack/build/otf/* /usr/share/fonts/hack
+	echo "Installing Font-Awesome"
+	cd "${MAKEDIR}"
+	git clone https://github.com/FortAwesome/Font-Awesome.git
+	cd "${MAKEDIR}"/Font-Awesome/fonts
+	cp fontawesome-webfont.ttf /usr/share/fonts/opentype/font-awesome
+	cp FontAwesome.otf /usr/share/fonts/opentype
+	mkdir /usr/share/fonts/truetype/font-awesome
+	cp fontawesome-webfont.ttf /usr/share/fonts/truetype/font-awesome
+	fc-cache -fs
+	mkfontscale /usr/share/fonts/
+	mkfontdir /usr/share/fonts/
+}
+configFonts() {
+	cat <<-EOF > /etc/font/local.conf
+	<?xml version='1.0'?>
+	<!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
+	<fontconfig>
+	    <match target="font">
+	        <edit mode="assign" name="rgba">
+	            <const>rgb</const>
+	        </edit>
+	    </match>
+	    <match target="font">
+	        <edit mode="assign" name="hinting">
+	            <bool>true</bool>
+	        </edit>
+	    </match>
+	    <match target="font">
+	        <edit mode="assign" name="hintstyle">
+	            <const>hintslight</const>
+	        </edit>
+	    </match>
+	    <match target="font">
+	        <edit mode="assign" name="antialias">
+	            <bool>true</bool>
+	        </edit>
+	    </match>
+	    <match target="font">
+	        <edit mode="assign" name="lcdfilter">
+	            <const>lcddefault</const>
+	        </edit>
+	    </match>
+	</fontconfig>
+	EOF
+}
