@@ -91,9 +91,14 @@ setRepos() {
 	add-apt-repository ppa:ansible/ansible
 	add-apt-repository ppa:git-core/ppa
 	add-apt-repository ppa:neovim-ppa/unstable
+	vboxRepo
+	ansibleRepo
+	neovimRepo
+	neofetchRepo
+	dockerRepo
 }
 vboxRepo() {
-	wget -q https://www.vitrualbox/org/downloads/oracle_vbox_2016.asc -O- | apt-key add -
+	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | apt-key add -
 	# add virtualbox
 	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
 	deb http://download.virtualbox.org/virtualbox/debian xenial contrib
@@ -1153,5 +1158,4 @@ main() {
 }
 
 main "$@"
-
 
