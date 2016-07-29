@@ -61,7 +61,7 @@ dockerRepo() {
 }
 atomRepo() {
 	echo "Linking Atom Repo"
-	apt-key adv--keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 7B2C3B0889BF5709A105D03AC2518248EEA14886
+	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 7B2C3B0889BF5709A105D03AC2518248EEA14886
 	cat <<-EOF > /etc/apt/sources.list.d/atom.list
 	deb http://ppa.launchpad.net/webupd8team/atom/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/webupd8team/atom/ubuntu xenial main 
@@ -70,7 +70,7 @@ atomRepo() {
 
 firefoxRepo() {
 	echo "Linking Firefox Repo"
-	apt-key adv--keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B34505EA326FEAEA07E3618DEF4186FE247510BE
+	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys B34505EA326FEAEA07E3618DEF4186FE247510BE
 	cat <<-EOF > /etc/apt/sources.list.d/firefox-aurora.list
 	deb http://ppa.launchpad.net/ubuntu-mozilla-daily/firefox-aurora/ubuntu xenial main 
 	deb-src http://ppa.launchpad.net/ubuntu-mozilla-daily/firefox-aurora/ubuntu xenial main 
