@@ -16,110 +16,19 @@ set -e
 
 export DEBIAN_FRONTEND=noninteractive
 
-setSources() {
-	apt-get update
-	apt-get install -y \
-		apt-transport-https \
-		gnupg \
-		ca-certificates \
-		--no-install-recommends
-	mv /etc/apt/sources.list /etc/apt/sources.list.original
-	cat <<-EOF > /etc/apt/sources.list
-	# See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to newer versions of the distribution.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial main restricted
-
-	## Major bug fix updates produced after the final release of the distribution.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
-
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team.
-	## Also, please note that software in universe WILL NOT receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial universe
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial universe
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates universe
-
-	## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu team, and may not be under a free licence.
-	## Please satisfy yourself as to your rights to use the software. Also, please note that software in multiverse WILL NOT
-	## receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial multiverse
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-updates multiverse
-
-	## N.B. software from this repository may not have been tested as extensively as that contained in the main release,
-	## although it includes newer versions of some applications which may provide useful features.
-	## Also, please note that software in backports WILL NOT receive any review or updates from the Ubuntu security team.
-	deb http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
-	deb-src http://au.archive.ubuntu.com/ubuntu/ xenial-backports main restricted universe multiverse
-
-	deb http://security.ubuntu.com/ubuntu xenial-security main restricted
-	deb-src http://security.ubuntu.com/ubuntu xenial-security main restricted
-	deb http://security.ubuntu.com/ubuntu xenial-security universe
-	deb-src http://security.ubuntu.com/ubuntu xenial-security universe
-	deb http://security.ubuntu.com/ubuntu xenial-security multiverse
-	deb-src http://security.ubuntu.com/ubuntu xenial-security multiverse
-	EOF
-
-	# turn off translations, speed up apt-get update
-	mkdir -p /etc/apt/apt.conf.d
-	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
-}
 setRepos() {
+	source payload/zbcncRepo
+	setSources
 	vboxRepo
 	ansibleRepo
 	neovimRepo
 	neofetchRepo
 	dockerRepo
+	atomRepo
+	firefoxRepo
+	chromeRepo
+	setTranslations
 }
-vboxRepo() {
-	wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | apt-key add -
-	# add virtualbox
-	cat <<-EOF > /etc/apt/sources.list.d/vbox.list
-	deb http://download.virtualbox.org/virtualbox/debian xenial contrib
-	EOF
-}
-neofetchRepo() {
-	# add neofetch
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21586B87BB628FBD890051BAC52419204221BA96
-	cat <<-EOF > /etc/apt/sources.list.d/neofetch.list
-	deb http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
-	deb-src http://ppa.launchpad.net/dawidd0811/neofetch/ubuntu xenial main
-	EOF
-}
-ansibleRepo() {
-	# add ansible
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6125E2A8C77F2818FB7BD15B93C4A3FD7BB9C367
-	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
-	deb http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
-	deb-src http://ppa.launchpad.net/ansible/ansible/ubuntu xenial main
-	EOF
-}
-neovimRepo() {
-	# add neovim
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 9DBB0BE9366964F134855E2255F96FCF8231B6DD
-	cat <<-EOF > /etc/apt/sources.list.d/ansible.list
-	deb http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
-	deb-src http://ppa.launchpad.net/neovim-ppa/unstable/ubuntu xenial main
-	EOF
-}
-gitRepo() {
-	# add git-core
-	apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
-	cat <<-EOF > /etc/apt/sources.list.d/git-core.list
-	deb http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
-	deb-src http://ppa.launchpad.net/git-core/ppa/ubuntu xenial main
-	EOF
-}
-dockerRepo() {
-	# add docker apt repo
-	apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-	cat <<-EOF > /etc/apt/sources.list.d/docker.list
-	deb http://apt.dockerproject.org/repo ubuntu-xenial main
-	EOF
-}
-
 # installs base packages
 deployAppUtils() {
 	apt-get update
