@@ -87,10 +87,6 @@ setSources() {
 	echo 'Acquire::Languages "none";' > /etc/apt/apt.conf.d/99translations
 }
 setRepos() {
-	add-apt-repository ppa:dawidd0811/neofetch
-	add-apt-repository ppa:ansible/ansible
-	add-apt-repository ppa:git-core/ppa
-	add-apt-repository ppa:neovim-ppa/unstable
 	vboxRepo
 	ansibleRepo
 	neovimRepo
@@ -198,6 +194,7 @@ deployAppUtils() {
 		unrar \
 		asciidoc \
 		flashplugin-installer \
+		cabextract \
 		alsa-base \
 		alsa-utils \
 		lm-sensors \
@@ -300,22 +297,27 @@ deployDocker() {
 }
 
 # install graphics drivers
-deployGraphics() {
-	# Display link
-	cd "${MAKEDIR}"
-	git clone https://github.com/DisplayLink/evdi.git
-	cd evdi
-	make
-	make install
-
+configHardware() {
+	#configDisplaylink
+	configBluetooth
+}
+configDisplaylink() {
+	setVars
+	cd "$MAKEDIR"
 	wget http://www.displaylink.com/downloads/file?id=123
 	mv file?id=123 displaylink.zip
-	unzip displaylin.zip
-	./displaylink-driver-0.9.68.run --noexec --keep
-
-	# Bluetooth
-	cp /home/loki/00-build-pkgs/BCM20702A1_001.002.014.1443.1572.hcd /lib/firmware/brcm/BCM20702A1-0a5c-216f.hcd
-	ln -s /lib/firmware/brcm/BCM20702A1-0a5c-216f.hcd /lib/firmware/brcm/BCM20702A0-0a5c-216f.hcd
+	unzip displaylink.zip
+	chmod +x displaylink-driver-1.0.335.run
+	./displaylink-driver-1.0.335 --noexec --keep
+}
+configBluetooth() {
+	setVars
+	cd "$MAKEDIR"
+	wget http://download.windowsupdate.com/d/msdownload/update/driver/drvs/2014/07/20662520_6c535fbfa9dca0d07ab069e8918896086e2af0a7.cab
+	cabextract 20662520_6c535fbfa9dca0d07ab069e8918896086e2af0a7.cab
+	hex2hcd BCM20702A1_001.002.014.1443.1572.hex
+#	mv BCM20702A1_001.002.014.1443.1572.hcd /lib/firmware/brcm/BCM20702A1-0a5c-216f.hcd
+#	ln -rs /lib/firmware/BCM20702A1-0a5c-216f.hcd /lib/firmware/BCM20702A0-0a5c-216f.hcd
 }
 
 # install custom scripts/binaries
@@ -365,11 +367,15 @@ deploySyncthing() {
 
 # install stuff for i3 window manager
 deployWM() {
+	checkSudo
+	setUsername
+	setVars
+	deployXorg
+	deployI3wm
 	deployCompton & showLoading "$@"
 	deployRofi & showLoading "$@"
 	deployMaim & showLoading "$@"
 	deploySlop & showLoading "$@"
-	
 	# update clickpad settings
 	mkdir -p /etc/X11/xorg.conf.d/
 	curl -sSL https://raw.githubusercontent.com/affinityskin/dotfiles/master/etc/X11/xorg.conf.d/50-synaptics-clickpad.conf > /etc/X11/xorg.conf.d/50-synaptics-clickpad.conf
@@ -492,14 +498,17 @@ echo "Installing Xorg"
 		x11-session-utils \
 		x11proto-core-dev \
 		mesa-common-dev \
-		glew-utils
-		zbcnc_xfixes & showLoading
-		deployXedgewarp & showLoading
-		deployXtitle & showLoading
-		deployXRMutil & showLoading
+		glew-utils \
+		--no-install-recommends
+
+	deployXfixes & showLoading
+	deployXedgewarp & showLoading
+	deployXtitle & showLoading
+	deployXRMutil & showLoading
 }
 
 deployXdeps() {
+	apt-get install -y \
 		libx11-dev \
 		libxcomposite-dev \
 		libxdamage-dev \
@@ -513,7 +522,7 @@ deployXdeps() {
 		libpam0g-dev \
 		libcairo2-dev \
 		libx11-dev \
-		libx11-xcb-dev
+		libx11-xcb-dev \
 		libglib2.0-dev \
 		libx11-dev \
 		libstartup-notification0-dev \
@@ -528,7 +537,7 @@ deployXdeps() {
 		libxcb-util1 \
 		libxcb-util-dev \
 		xutils-dev \
-		libxcb-util0-dev
+		libxcb-util0-dev \
 		libxcb1-dev \
 		libxcb-keysyms1-dev \
 		libconfuse-dev \
@@ -536,7 +545,7 @@ deployXdeps() {
 		libasound2-dev \
 		libiw-dev \
 		libcap2-bin \
-		libpulse-dev
+		libpulse-dev \
 		libpango1.0-dev \
 		libxcb-util0-dev \
 		libxcb-icccm4-dev \
@@ -558,7 +567,7 @@ deployXdeps() {
 		libxcb-util0-dev \
 		libimlib2-dev \
 		libxrandr-dev \
-a		libxfixes-dev \
+		libxfixes-dev \
 		libxext-dev \
 		libgl1-mesa-dev \
 		libxrender-dev \
@@ -566,7 +575,7 @@ a		libxfixes-dev \
 		libglm-dev \
 		libx11-xcb-dev \
 		libxcb-ewmh-dev \
-		libxcb-dpms0-dev
+		libxcb-dpms0-dev \
 		libxrender-dev \
 		libxrandr-dev \
 		libxinerama-dev \
@@ -577,13 +586,21 @@ a		libxfixes-dev \
 		libpcre3-dev \
 		libdbus-1-dev \
 		libpcre3-dev \
+		libpcre2-dev \
 		libconfig-dev \
 		libdrm-dev \
 		libgl1-mesa-dev \
-		libgl1-mesa-glx
+		libgl1-mesa-glx \
+		libxslt1-dev \
+		libxml2-utils \
+		xsltproc \
+		xmlto \
+		docbook-xml \
+		--no-install-recommends
 }
 
-zbcnc_xfixes() {
+deployXfixes() {
+	setVars
 	echo "Compiling Unclutter-xfixes"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/unclutter-xfixes.git
@@ -594,6 +611,7 @@ zbcnc_xfixes() {
 }
 
 deployXedgewarp() {
+	setVars
 	echo "Compiling xEdgewarp"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/xedgewarp.git
@@ -604,16 +622,18 @@ deployXedgewarp() {
 }
 
 deployXtitle() {
+	setVars
 	echo "Compiling xTitle"
 	cd "${MAKEDIR}"
 	git clone https://github.com/baskerville/xtitle.git
-a	sleep 1
+	sleep 1
 	cd "${MAKEDIR}"/xtitle
 	make
 	make install
 }
 
 deployXRMutil() {
+	setVars
 	echo "Compiling XCB Util-XRM Module"
 	cd "${MAKEDIR}"
 	git clone --recursive https://github.com/Airblader/xcb-util-xrm.git
@@ -623,8 +643,8 @@ deployXRMutil() {
 	make install
 }
 deployCompton() {
+	setVars
 	echo "Installing Compton"
-	apt-get install -y \
 	cd "${MAKEDIR}"
 	git clone https://github.com/chjj/compton.git
 	cd "${MAKEDIR}"/compton
@@ -634,22 +654,26 @@ deployCompton() {
 }
 
 deployI3deps() {
-echo "Adding i3 Keyring"
-apt-get --allow-unauthenticated install -y sur5r-keyring
-apt-get update
-sleep 1
+	setVars
+	echo "Adding i3 Keyring"
+	apt-get --allow-unauthenticated install -y sur5r-keyring
+	apt-get update
+	sleep 1
 
-echo "Installing i3 Gaps Deps"
-apt-get build-dep -y \
-	i3 \
-	i3blocks \
-	i3lock
-apt-get install -y \
-	libanyevent-i3-perl \
-	libjson-xs-perl
+	echo "Installing i3 Gaps Deps"
+	apt-get build-dep -y \
+		i3 \
+		i3blocks \
+		i3lock
+	apt-get install -y \
+		libanyevent-i3-perl \
+		libjson-xs-perl
 }
 
 deployI3wm() {
+	setVars
+	deployCompton
+	deployI3deps
 	echo "Compiling i3 Gaps"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3.git
@@ -664,9 +688,10 @@ deployI3wm() {
 	deployI3blocks & showLoading "$@"
 	deployI3status & showLoading "$@"
 	deployI3lock & showLoading "$@"
-
+	deployRofi
 }
 deployI3blocks() {
+	setVars
 	echo "Installing i3 Block Gaps"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3blocks-gaps.git
@@ -679,6 +704,7 @@ deployI3blocks() {
 }
 
 deployI3status() {
+	setVars
 	echo "compiling i3status"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3status.git
@@ -689,6 +715,7 @@ deployI3status() {
 }
 
 deployI3lock() {
+	setVars
 	echo "compiling i3lock"
 	cd "${MAKEDIR}"
 	git clone https://github.com/Airblader/i3lock.git
@@ -699,6 +726,7 @@ deployI3lock() {
 }
 
 deployRofi() {
+	setVars
 	echo "Installing Rofi"
 	cd "${MAKEDIR}"
 	git clone https://github.com/DaveDavenport/rofi.git
@@ -1116,7 +1144,7 @@ main() {
 		setSources
 		setRepos
 		deployAppUtils
-		deployGraphics
+		configHardware
 
 	elif [[ $cmd == "run" ]]; then
 		checkSudo
@@ -1128,11 +1156,11 @@ main() {
 
 	elif [[ $cmd == "i3wm" ]]; then
 		checkSudo
-		deployXdeps & showLoading "$@"
-		deployXorg & showLoading "$@"
-		deployI3deps & showLoading "$@"
-		deployI3wm "$@" & showLoading "$@"
-		deployWM "$@" & showLoading "$@"
+		showLoading "$@" & deployXdeps
+		showLoading "$@" & deployXorg
+		showLoading "$@" & deployI3deps
+		showLoading "$@" & deployI3wm "$@"
+		showLoading "$@" & deployWM "$@"
 
 	elif [[ $cmd == "dotfiles" ]]; then
 		deployDotfiles "$2"
