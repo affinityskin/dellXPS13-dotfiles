@@ -1,26 +1,33 @@
 */*.swp
 */.vim/.netrwhist
-dotfiles/.i3/config.vanilla
+userdots/.i3/config.vanilla
 */__pycache__
 *.pyc
 
-dotfiles/.config/*
-!.config/dunst
-!.config/gsimplecal
-!.config/gtk-2.0
-!.config/gtk-3.0
-!.config/termite
-!.config/wallpapers
-!.config/sublime-text-3/Installed Packages/
-!.config/htop
-!.config/htop/htoprc
-!.config/i3lock
-!.config/i3blocks
-!.config/i3blocks/config
-!.config/filezilla
+userdots/.config/*
+!userdots/.config/dunst
+!userdots/.config/gsimplecal
+!userdots/.config/gtk-2.0
+!userdots/.config/gtk-3.0
+!userdots/.config/termite
+!userdots/.config/wallpapers
+!userdots/.config/sublime-text-3/Installed Packages/
+!userdots/.config/htop
+!userdots/.config/htop/htoprc
+!userdots/.config/i3lock
+!userdots/.config/i3blocks
+!userdots/.config/i3blocks/config
+!userdots/.config/filezilla
 
 
-dotfiles/.weechat/*
-!.weechat/weechat.conf
-!.weechat/plugins.conf
-!.weechat/perl/beep.pl
+userdots/.weechat/*
+!userdots/.weechat/weechat.conf
+!userdots/.weechat/plugins.conf
+!userdots/.weechat/perl/beep.pl
+
+.vagrant
+menu.sh
+ee
+xx
+userdots/.atom/*
+

@@ -85,7 +85,7 @@ deployGolang() {
 		owner=$(dirname "$project")
 		repo=$(basename "$project")
 		if [[ -d "${HOME}/${repo}" ]]; then
-			rm -rf "${HOME}/${repo}"
+			rm -rf "${HOME}:?/${repo}"
 		fi
 
 		mkdir -p "${GOPATH}/src/github.com/${owner}"

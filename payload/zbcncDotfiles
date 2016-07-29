@@ -27,7 +27,6 @@ linkUserdots() {
 	ln -snf "$DOTFILES"/i3 "$HOME"/.i3
 	ln -snf "$DOTFILES"/irssi "$HOME"/.irssi
 	ln -snf "$DOTFILES"/nginx "$HOME"/.nginx
-	ln -snf "$DOTFILES"/cripts "$HOME"/.scripts
 	ln -snf "$DOTFILES"/vim "$HOME"/.vim
 	ln -snf "$DOTFILES"/weechat "$HOME"/.weechat
 	# link dotfiles
@@ -51,21 +50,22 @@ linkUserdots() {
 	ln -snf "$DOTFILES"/xinitrc "$HOME"/.xinitrc
 	ln -snf "$DOTFILES"/Xresources "$HOME"/.Xresources
 	#mv "${HOME}"/.config "${HOME}"/.config-bu
+	ln -snf "$SCRIPTDOTS" "$HOME"/.scripts
 	source ~/.bashrc
 }
 linkRootdots() {
-mv "${ROOTDIR}"/.bashrc "${ROOTDIR}"/.bashrc.original
-ln -snf "${ROOTDOTS}"/.bashrc "${ROOTDIR}"/.bashrc
-# folders
-ln -snf "${ROOTDOTS}"/.bash.d "${ROOTDIR}"/.bash.d
-ln -snf "${ROOTDOTS}"/scripts "${ROOTDIR}"/scripts
-ln -snf "${ROOTDOTS}"/.xinitrc "${ROOTDIR}"/.xinitrc
-ln -snf "${ROOTDOTS}"/.Xresources "${ROOTDIR}"/.Xresources
-# set permissions
-chown -R root:root "${ROOTDIR}"/.bashrc
-chown -R root:root "${ROOTDIR}"/.bashrc-bu
-chown -R root:root "${ROOTDIR}"/.bash.d
-chown -R root:root "${ROOTDIR}"/scripts
-chown -R root:root "${ROOTDIR}"/.xinitrc
-chown -R root:root "${ROOTDIR}"/.Xresources
+	mv "${ROOTDIR}"/.bashrc "${ROOTDIR}"/.bashrc.original
+	ln -snf "${ROOTDOTS}"/.bashrc "${ROOTDIR}"/.bashrc
+	# folders
+	ln -snf "${ROOTDOTS}"/.bash.d "${ROOTDIR}"/.bash.d
+	ln -snf "${ROOTDOTS}"/scripts "${ROOTDIR}"/scripts
+	ln -snf "${ROOTDOTS}"/.xinitrc "${ROOTDIR}"/.xinitrc
+	ln -snf "${ROOTDOTS}"/.Xresources "${ROOTDIR}"/.Xresources
+	# set permissions
+	chown -R root:root "${ROOTDIR}"/.bashrc
+	chown -R root:root "${ROOTDIR}"/.bashrc-bu
+	chown -R root:root "${ROOTDIR}"/.bash.d
+	chown -R root:root "${ROOTDIR}"/scripts
+	chown -R root:root "${ROOTDIR}"/.xinitrc
+	chown -R root:root "${ROOTDIR}"/.Xresources
 }

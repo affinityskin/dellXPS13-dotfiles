@@ -195,7 +195,7 @@ deployTermite() {
 	
 	cat <<-EOF > "$HOME"/termite/desktop.termite
 	#!/bin/sh
-	`grep '^Exec' $1 | tail -1 | sed 's/^Exec=//' | sed 's/%.//'` &
+	$(grep '^Exec' "$1" | tail -1 | sed 's/^Exec=//' | sed 's/%.//') &
 	EOF
 	echo "'Run ~/./deskopen termite.desktop' after next reboot"
 }
